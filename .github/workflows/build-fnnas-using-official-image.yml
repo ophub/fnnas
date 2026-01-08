@@ -30,6 +30,7 @@ on:
           - bdy-g18-pro
           - beikeyun
           - chainedbox
+          - cm3588-nas
           - crrc
           - dc-a588
           - dg3399
@@ -59,6 +60,7 @@ on:
           - lckfb-tspi
           - leez
           - lx-r3s
+          - lz-k3568
           - mrkaio-m68s
           - nanopc-t6
           - nanopi-r5c
