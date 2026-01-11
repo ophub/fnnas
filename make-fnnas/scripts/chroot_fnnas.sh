@@ -23,7 +23,7 @@
 #
 
 
-# 1. 创建2G大小的swap文件（U盘根分区，空间不足可改1G）
+# 1. 创建2G大小的swap文件（U盘根分区，空间不足可改1G） 给1G电视盒子做的，增加SWAP，就不会那么卡了
 btrfs subvolume create /swap
 chattr +C /swap
 cd /swap
