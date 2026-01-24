@@ -40,13 +40,15 @@
 | s905w | [X96-Mini](https://github.com/ophub/amlogic-s9xxx-armbian/issues/621), [TX3-Mini](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1062), [W95](https://github.com/ophub/amlogic-s9xxx-armbian/issues/570), [X96W/FunTV](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1044), [MXQ-Pro-4K](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1140), [MeCool-m8s-pro-W](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3245) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | s905 | [Beelink-Mini-MX-2G](https://github.com/ophub/amlogic-s9xxx-armbian/issues/127), [Sunvell-T95M](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/337), [MXQ-Pro+4K](https://github.com/ophub/amlogic-s9xxx-armbian/issues/715), [SumaVision-Q5](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1175) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | rk3588(s) | [Radxa-Rock5B](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1240), [Radxa-Rock5C](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2324), [Orange-Pi-5-Plus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2400), [Beelink-IPC-R](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/415), [HLink-H88K](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1726), [HLink-H88K-V3](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1726), [NanoPC-T6](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2453), [Smart-Am60](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2817), [DC-A588](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2988), [Orangepi-5B](https://github.com/ophub/amlogic-s9xxx-armbian/pull/3052), [CM3588-NAS](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3306) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
-| rk3399 | [EAIDK-610](https://github.com/ophub/amlogic-s9xxx-armbian/pull/991), [King3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1080), [TN3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1094), [Kylin3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1132), [ZCube1-Max](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1247), [CRRC](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1280), [SMART-AM40](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1317), [SW799](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1326), [ZYSJ](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1380), [DG-3399](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1492), [DLFR100](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1522), [Emb3531](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1549), [Leez-p710](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1609), [tvi3315a](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1687), [xiaobao](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1698), [Fine3399](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1790), [Firefly-RK3399](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/491), [LX-R3S](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2026), [Hugsun-x99](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2050), [Tb-ls3399](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2146), [Hisense-hs530r](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/572), [Tpm312](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2403), [ZK-rk39a](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2446), [YSKJ](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2673), [Fmx1-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2691), [Sv-33a6x](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/748), [AIO-3399b](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3185) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
+| rk3576 | [NanoPi-m5](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3207) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
+| rk3399 | [EAIDK-610](https://github.com/ophub/amlogic-s9xxx-armbian/pull/991), [King3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1080), [TN3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1094), [Kylin3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1132), [ZCube1-Max](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1247), [CRRC](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1280), [SMART-AM40](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1317), [SW799](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1326), [ZYSJ](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1380), [DG-3399](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1492), [DLFR100](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1522), [Emb3531](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1549), [Leez-p710](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1609), [tvi3315a](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1687), [xiaobao](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1698), [Fine3399](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1790), [Firefly-RK3399](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/491), [LX-R3S](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2026), [Hugsun-x99](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2050), [Tb-ls3399](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2146), [Hisense-hs530r](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/572), [Tpm312](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2403), [ZK-rk39a](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2446), [YSKJ](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2673), [Fmx1-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2691), [Sv-33a6x](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/748), [AIO-3399b](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3185), [TaraM](https://github.com/ophub/u-boot/pull/28) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | rk3568 | [FastRhino-R66S](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1061), [FastRhino-R68S](https://github.com/ophub/amlogic-s9xxx-armbian/issues/774), [Radxa-E25](https://wiki.radxa.com/Rock3/CM/CM3I/E25), [NanoPi-R5S](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1217), [NanoPi-R5C](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1217), [HLink-H66K](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1726), [HLink-H68K](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1726), [HLink-H69K](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1726), [Seewo-sv21](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2017), [Mrkaio-m68s](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2155), [Swan1-w28](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2407), [Ruisen-box](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2508), [DG-TN3568](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2661), [Alark35-3500](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2911), [MMBox-Anas3035](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2995), [Wocyber-A3](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2978), [Photonicat](https://github.com/ophub/amlogic-s9xxx-openwrt/pull/827), [NSY-G16-Plus](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/845), [NSY-G68-Plus](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/845), [BDY-G18-Pro](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/847), [Gzpeite-P01](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3221), [LZ-K3568](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3304) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
-| rk3566 | [Panther-X2](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1319), [JP-TvBox](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1867), [LCKFB-Taishan-Pi](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2538), [WXY-OEC-turbo-4g](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2736), [Station-M2](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/744) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
+| rk3566 | [Panther-X2](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1319), [JP-TvBox](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1867), [LCKFB-Taishan-Pi](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2538), [WXY-OEC-turbo-4g](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2736), [Station-M2](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/744), [Orange-Pi-3B](https://github.com/ophub/fnnas/issues/261) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | rk3528 | [HLink-H28K](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1726), [Radxa-E20C](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2324), [H96-Max-M2](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2404) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | rk3328 | [BeikeYun](https://github.com/ophub/amlogic-s9xxx-armbian/issues/852), [Chainedbox-L1-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1680), [Station-M1](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313), [Bqeel-MVR9](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313), [Renegade/Firefly](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1861) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | rk3318 | [RX3318-Box](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2129) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | h6 | [Vplus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1100), [Tanix-TX6](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1120), [TQC-A01](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1638) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
+| h618 | [OrangePi-Zero3](https://github.com/ophub/fnnas/issues/158) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 
 > [!TIP]
 > 目前 [s905 的盒子](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173)只能在 `TF/SD/USB` 中使用，其他型号的盒子支持写入 `eMMC` 中使用。更多信息请查阅 [✅支持的设备列表说明](make-fnnas/fnnas-files/common-files/etc/model_database.conf)。可以参考说明文档中 12.15 章节的方法[添加新的支持设备](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/documents/README.cn.md#1215-如何添加新的支持设备)。
@@ -62,21 +64,35 @@
 2. `Amlogic` 和 `Allwinner` 平台，使用 [Rufus](https://rufus.ie/) 或者 [balenaEtcher](https://www.balena.io/etcher/) 等工具将系统写入 USB 里，然后把写好系统的 USB 插入盒子。到设备接入的路由器里查找新上线的名称是 debian 的设备，查看其 IP 地址（例如：`192.168.1.15`），然后通过浏览器访问 http://192.168.1.15:5666 进入飞牛账号创建界面。创建自定义账号后登录飞牛系统，在 `系统设置` → `SSH` 里开启 SSH 功能，然后使用 SSH 连接工具进入系统终端，输入命令：
 
 ```shell
+sudo -i
 fnnas-install
 ```
 
 | 可选参数  | 默认值   | 选项     | 说明            |
 | -------  | ------- | ------  | -------------- |
 | -m       | no      | yes/no  | 使用主线 u-boot  |
-| -a       | yes     | yes/no  | 使用 [ampart](https://github.com/7Ji/ampart) 分区表调整工具 |
+| -a       | no      | yes/no  | 使用 [ampart](https://github.com/7Ji/ampart) 分区表调整工具 |
 | -l       | no      | yes/no  | 显示全部设备列表  |
 
-举例: `fnnas-install -m yes -a no`
+举例：`fnnas-install -m yes -a no`
+
+> [!TIP]
+> 分区选项说明：当磁盘可用空间大于 16GiB 时，支持自定义系统根分区大小（默认 16GiB）。
+>
+> 在系统重装过程中，脚本会自动检测 eMMC 上的分区结构。若发现存在个人数据分区（P3），分区菜单将激活选项 `3`。选择该选项可严格保留当前分区表布局，从而确保 P3 分区内的数据不被覆盖。 系统安装完毕后，您可以在飞牛系统的 `存储空间管理` 界面中直接挂载并使用该分区。
+
+| 选项     | 说明   |
+| :-----: | :----- |
+| **1**   | 系统分区(Rootfs) 限制为 **16GiB**。             |
+| **2**   | **[默认]** 系统分区扩容至全盘 (**100%**)。       |
+| **3**   | **继承当前系统分区大小** (保留 P3 分区的个人数据)。 |
+| **≥16** | 输入数字 (**GiB**) 以自定义系统分区大小。         |
 
 - ### 更新 FnNAS 内核
 
 登录 FnNAS 系统 SSH 终端 → 输入命令：
 ```shell
+sudo -i
 fnnas-update
 ```
 
@@ -159,11 +175,12 @@ sudo apt-get install -y $(cat make-fnnas/script/ubuntu2404-make-fnnas-depends)
 
 | 参数  | 含义       | 说明        |
 | ---- | ---------- | ---------- |
-| -b   | Board      | 指定需要编译的设备代号。例如，`-b s905x3` 表示编译代号为 s905x3 的设备，多个设备可用下划线连接，如 `-b s905x3_s905d`。特殊值：`all` 表示编译全部设备，`first50` 表示编译设备库中的前 50 个，`from50` 表示从第 51 个开始至最后一个，`last20` 表示最后的 20 个。设备代号列表详见 [model_database.conf](make-fnnas/fnnas-files/common-files/etc/model_database.conf) 中的 `BOARD` 配置项。默认值为 `all` |
+| -b   | Board      | 指定需要编译的设备代号。例如，`-b s905x3` 表示编译代号为 s905x3 的设备，多个设备可用下划线连接，如 `-b s905x3_s905d`。特殊值：`all` 表示编译全部设备，`first50` 表示编译设备库中的前 50 个，`range50_100` 表示从第 51 个开始至第 100 个，`range100_150` 表示从第 101 个开始至第 150 个，`last20` 表示最后的 20 个。设备代号列表详见 [model_database.conf](make-fnnas/fnnas-files/common-files/etc/model_database.conf) 中的 `BOARD` 配置项。默认值为 `all` |
 | -r   | KernelRepo | 指定 github.com 内核仓库的 `<owner>/<repo>`。默认值：`ophub/fnnas` |
 | -k   | Kernel     | 指定 [kernel](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) 名称，如 `-k 6.12.63` 。多个内核使用 `_` 进行连接，如 `-k 6.12.63_6.18.3` 。 |
 | -a   | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动在内核库中查找在 `-k` 中指定的内核如 6.12.63 的同系列是否有更新的版本，如有 6.12.63 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
 | -s   | Size       | 对系统的镜像分区大小（单位：MiB）进行设置，只设置 `ROOTFS` 分区大小时可以只指定一个数值，例如： `-s 6144`。需要同时设置 `BOOTFS` 和 `ROOTFS` 分区大小时，使用 / 对两个数值进行连接，例如： `-s 512/6144`。默认值：`512/6144` |
+| -e   | RootfsExpand | 设置系统根分区自动扩容大小（单位：GiB）。默认值：`16` |
 | -n   | BuilderName | 设置 FnNAS 系统构建者签名。设置签名时请勿包含空格。默认值：`无` |
 
 - `sudo ./renas` : 使用默认配置，对全部型号的电视盒子进行打包。
@@ -174,21 +191,23 @@ sudo apt-get install -y $(cat make-fnnas/script/ubuntu2404-make-fnnas-depends)
 - `sudo ./renas -b s905x3_s905d`  使用默认配置，对多个型号的电视盒子进行全部内核打包, 使用 `_` 进行多型号连接。
 - `sudo ./renas -k 6.12.63_6.18.3` : 使用默认配置，指定多个内核，进行全部型号电视盒子进行打包, 内核包使用 `_` 进行连接。
 - `sudo ./renas -k 6.12.63_6.18.3 -a true` : 使用默认配置，指定多个内核，进行全部型号电视盒子进行打包, 内核包使用 `_` 进行连接。自动升级到同系列最新内核。
+- `sudo ./renas -b s905x3 -e 32` : 使用默认配置，指定打包 `s905x3` 的固件，系统根分区自动扩容大小设定为 `32` GiB。
 
 ## 使用 GitHub Actions 进行镜像编译
 
 1. 关于 Workflows 文件的配置在 [.github/workflows](.github/workflows) 文件里。
 
-2. 在 [Actions](https://github.com/ophub/fnnas/actions) 页面里选择 ***`Build FnNAS`*** 即可使用 [build-fnnas-using-official-image.yml](.github/workflows/build-fnnas-using-official-image.yml) 进行编译。点击 ***`Run workflow`*** 按钮即可编译。在选项面板里，可以在 `Set fnnas image file path` 里设置 FnNAS 镜像文件的路径，例如： `https://fnnas.com/.../fnos_arm_1.0.0_258.img.xz` 等网络下载地址，如果不设置，将默认使用 [ophub/fnnas](https://github.com/ophub/fnnas/releases/tag/fnnas_base_image) 里保存的官方镜像进行编译。
+2. 在 [Actions](https://github.com/ophub/fnnas/actions) 页面里选择 ***`Build FnNAS Image`*** 即可使用 [build-fnnas-image.yml](.github/workflows/build-fnnas-image.yml) 进行编译。点击 ***`Run workflow`*** 按钮即可编译。在选项面板里，可以在 `Custom fnnas image download url` 里设置 FnNAS 镜像文件的路径，例如： `https://fnnas.com/.../fnos_arm_1.0.0_258.img.xz` 等网络下载地址，如果不设置，将默认使用 [fnnas_base_image](https://github.com/ophub/fnnas/releases/tag/fnnas_base_image) 里保存的官方镜像进行编译。
 
 ```yaml
-- name: Build FnNAS
+- name: Build FnNAS Image
   uses: ophub/fnnas@main
   with:
     build_target: fnnas
     fnnas_path: fnnas/*.img.xz
     fnnas_board: s905d_s905x3_s922x_s905x
     fnnas_kernel: 6.12.y
+    rootfs_expand: 16
 ```
 
 - ### GitHub Actions 制作 fnnas 镜像参数说明
@@ -199,18 +218,19 @@ sudo apt-get install -y $(cat make-fnnas/script/ubuntu2404-make-fnnas-depends)
 |------------------|---------------|--------------------------------------------------|
 | fnnas_path       | 无            | 设置官方 Arm64 原版 FnNAS 镜像文件的路径，支持使用当前工作流中的文件路径如 `fnnas/*.img.xz` ，也支持使用网络下载地址如： `https://fnnas.com/.../fnos_arm_1.0.0_258.img.xz` |
 | fnnas_board      | all           | 设置打包盒子的 `board` ，功能参考 `-b`                 |
-| kernel_repo      | ophub/fnnas  | 指定 github.com 内核仓库的 `<owner>/<repo>`，功能参考 `-r` |
+| kernel_repo      | ophub/fnnas   | 指定 github.com 内核仓库的 `<owner>/<repo>`，功能参考 `-r` |
 | fnnas_kernel     | 6.12.y        | 设置内核 [版本](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas)，功能参考 `-k` |
 | auto_kernel      | true          | 设置是否自动采用同系列最新版本内核，功能参考 `-a`       |
-| fnnas_size       | 512/6144      | 设置系统 BOOTFS 和 ROOTFS 分区的大小，功能参考 `-s`  |
-| builder_name     | 无             | 设置 FnNAS 系统构建者签名，功能参考 `-n`           |
+| fnnas_size       | 512/6144      | 设置系统 BOOTFS 和 ROOTFS 分区的大小，功能参考 `-s`   |
+| rootfs_expand    | 16            | 设置系统根分区自动扩容大小，功能参考 `-e`              |
+| builder_name     | 无            | 设置 FnNAS 系统构建者签名，功能参考 `-n`              |
 
 - ### 本地化制作 fnnas 内核参数说明
 
 | 参数  | 含义          | 说明        |
 | ---- | ------------- | ---------- |
 | -r   | debs_repo     | 指定 github.com 的 debs 内核仓库的 `<owner>/<repo>`。默认值：`ophub/fnnas` |
-| -k   | debs_version  | 指定 [kernel](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) 名称，如 `-k 6.12.63` 。默认值：`6.12.y` |
+| -k   | dtbs_version  | 指定 [kernel](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) 名称，如 `-k 6.12.63` 。默认值：`6.12.y` |
 | -e   | debs_install  | 设置是否安装官方提供的不同平台的 debs 格式内核包。选项：`amlogic` / `rockchip` / `allwinner` / `none`。默认值：`none` |
 | -t   | dtbs_install  | 设置是否补充安装官方没有的 dtbs 文件。可选项 `true` / `false`。默认值：`false` |
 
@@ -221,16 +241,16 @@ sudo apt-get install -y $(cat make-fnnas/script/ubuntu2404-make-fnnas-depends)
 
 ## 使用 GitHub Actions 编译 fnnas 内核
 
-飞牛专用内核的编译方法详见 [compile-kernel](.github/workflows/build-fnnas-kernel.yml) 的说明。
+飞牛专用内核的编译方法详见 [build-fnnas-kernel.yml](.github/workflows/build-fnnas-kernel.yml) 的说明。
 
 ```yaml
-- name: Compile the kernel
+- name: Build FnNAS Kernel
   uses: ophub/fnnas@main
   with:
     build_target: kernel
     fnnas_path: fnnas/*.img
     debs_repo: ophub/fnnas
-    debs_version: 6.12.y
+    dtbs_version: 6.12.y
     debs_install: amlogic
     dtbs_install: true
 ```
@@ -241,7 +261,7 @@ sudo apt-get install -y $(cat make-fnnas/script/ubuntu2404-make-fnnas-depends)
 |------------------|---------------|----------------------------------------------|
 | fnnas_path       | 无            | 设置官方 Arm64 原版 FnNAS 镜像文件的路径。        |
 | debs_repo        | ophub/fnnas   | 指定 github.com 的 debs 内核仓库的 `<owner>/<repo>`，功能参考 `-r` |
-| debs_version     | 6.12.y        | 设置内核版本号。功能参考 `-k`                    |
+| dtbs_version     | 6.12.y        | 设置内核版本号。功能参考 `-k`                    |
 | debs_install     | none          | 设置是否安装官方提供的不同平台的 debs 格式内核包。功能参考 `-e`   |
 | dtbs_install     | false         | 设置是否补充安装官方没有的 dtbs 文件。功能参考 `-t` |
 

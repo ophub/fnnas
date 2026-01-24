@@ -13,22 +13,23 @@ on:
       fnnas_base_version:
         description: "Select fnnas base image version"
         required: false
-        default: "amlogic_300"
+        default: "amlogic_389"
         type: choice
         options:
+          - amlogic_389
+          - amlogic_338
+          - amlogic_322
           - amlogic_300
+          - allwinner_335
+          - allwinner_317
+          - rockchip_388
+          - rockchip_330
+          - rockchip_321
           - rockchip_296
       debs_repo:
         description: "Set fnnas debs repository"
         required: false
         default: "ophub/fnnas"
-      debs_version:
-        description: "Set fnnas debs version"
-        required: false
-        default: "6.12.y"
-        type: choice
-        options:
-          - 6.12.y
       debs_install:
         description: "Install kernel debs files"
         required: false
@@ -39,6 +40,13 @@ on:
           - allwinner
           - rockchip
           - none
+      dtbs_version:
+        description: "Set fnnas dtbs version"
+        required: false
+        default: "6.12.y"
+        type: choice
+        options:
+          - 6.12.y
       dtbs_install:
         description: "Install kernel dtbs files"
         required: false
@@ -51,7 +59,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
+    if: ${{ github.event.repository.owner.id == github.event.sender.id }}
 
     steps:
       - name: Checkout
@@ -103,7 +111,7 @@ jobs:
           df -Th
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Download latest fnnas image
+      - name: Download fnnas image [ ${{ inputs.fnnas_base_version }} ]
         id: down
         working-directory: /builder
         if: (!cancelled())
@@ -150,20 +158,20 @@ jobs:
 
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Compile the fnnas kernel [ ${{ inputs.debs_version }} ]
+      - name: Compile the fnnas kernel
         uses: ophub/fnnas@main
-        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
+        if: ${{ steps.down.outputs.status == 'success' && !cancelled() }}
         with:
           build_target: kernel
           fnnas_path: fnnas/*.img.xz
           debs_repo: ${{ inputs.debs_repo }}
-          debs_version: ${{ inputs.debs_version }}
+          dtbs_version: ${{ inputs.dtbs_version }}
           debs_install: ${{ inputs.debs_install }}
           dtbs_install: ${{ inputs.dtbs_install }}
 
       - name: Upload Kernel to Release
         uses: ncipollo/release-action@main
-        if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
+        if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() }}
         with:
           tag: kernel_fnnas
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
@@ -173,9 +181,9 @@ jobs:
           makeLatest: false
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            - FnNAS Dedicated Kernel. Based on official [dtbs](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) packages from `fnnas.com`,
+            - FnNAS Dedicated Kernel. Based on official [.debs](https://github.com/ophub/fnnas/releases/tag/fnnas_debs) packages from `fnnas.com`,
               and repackaged into .tar.gz format using the `rekernel` tool.
               It is optimized for batch packaging and supports online updates via the `fnnas-update` command.
-            - FnNAS 专用内核。基于 `fnnas.com` 官方提供的 [dtbs](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) 安装包，
+            - FnNAS 专用内核。基于 `fnnas.com` 官方提供的 [.debs](https://github.com/ophub/fnnas/releases/tag/fnnas_debs) 安装包，
               利用本仓库的 `rekernel` 工具重新封装为 .tar.gz 格式。
               该内核既适用于批量打包，也支持通过 `fnnas-update` 命令进行在线更新。

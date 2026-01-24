@@ -313,8 +313,7 @@ query_version() {
         latest_version="$(
             curl -fsSL \
                 ${kernel_api}/releases/expanded_assets/kernel_${KERNEL_TAGS} |
-                grep -oE "${kernel_verpatch}\.[0-9]+-${PLATFORM}\.tar\.gz" |
-                sed "s/-${PLATFORM}\.tar\.gz//" |
+                grep -oP "${kernel_verpatch}\.[0-9]+(?=-${PLATFORM}\.tar\.gz)" |
                 sort -urV | head -n 1
         )"
         [[ -n "${latest_version}" ]] || error_msg "Failed to query kernel version from [ ${kernel_api} ]."
@@ -393,11 +392,11 @@ check_kernel() {
     [[ "${sha256sums_check}" -eq "1" ]] && {
         echo -e "${INFO} Start performing sha256sum verification..."
 
-        kernel_list=("boot" "dtb-${PLATFORM}" "modules" "header")
+        kernel_list=("boot" "dtb" "modules" "header")
         i="1"
         for kernel_file in "${kernel_list[@]}"; do
             # Set check filename
-            tmp_file="${kernel_file}-${kernel_name}.tar.gz"
+            tmp_file="${kernel_file}-${PLATFORM}-${kernel_name}.tar.gz"
             # Check if file exists
             [[ -s "${tmp_file}" ]] || {
                 # Header file is optional

@@ -50,8 +50,8 @@ tmp_image="${tmp_path}/tmp_image"
 
 # Set the fnnas kernel debs files download repository from github.com
 debs_repo="https://github.com/ophub/fnnas"
-# Set the fnnas kernel debs version (e.g., 6.12.y)
-debs_version="6.12.y"
+# Set the fnnas kernel dtbs version (e.g., 6.12.y)
+dtbs_version="6.12.y"
 # Installation of additional deb packages inside chroot(amlogic/allwinner/rockchip/none)
 debs_install="none"
 # By default, download and use dtbs files(true/yes)
@@ -128,7 +128,7 @@ init_var() {
             ;;
         -k | --kernel)
             if [[ -n "${2}" ]]; then
-                debs_version="${2}"
+                dtbs_version="${2}"
                 shift 2
             else
                 error_msg "Invalid -k parameter [ ${2} ]!"
@@ -159,7 +159,7 @@ init_var() {
     kernel_api="https://github.com/${debs_repo}"
 
     # Identify the kernel <VERSION> and <PATCHLEVEL>, such as [ 6.12 ]
-    kernel_verpatch="$(echo ${debs_version} | awk -F '.' '{print $1"."$2}')"
+    kernel_verpatch="$(echo ${dtbs_version} | awk -F '.' '{print $1"."$2}')"
 }
 
 download_debs() {
@@ -177,8 +177,7 @@ download_debs() {
     latest_version="$(
         curl -fsSL \
             ${kernel_api}/releases/expanded_assets/fnnas_debs |
-            grep -oE "${kernel_verpatch}\.[0-9]+\.tar\.gz" |
-            sed "s/\.tar\.gz//" |
+            grep -oP "${kernel_verpatch}\.[0-9]+(?=\.tar\.gz)" |
             sort -urV | head -n 1
     )"
     [[ -n "${latest_version}" ]] || error_msg "Failed to query kernel debs version from [ ${kernel_api} ]."
@@ -221,8 +220,7 @@ download_dtbs() {
     latest_version="$(
         curl -fsSL \
             https://github.com/ophub/kernel/releases/expanded_assets/kernel_stable |
-            grep -oE "${kernel_verpatch}\.[0-9]+\.tar\.gz" |
-            sed "s/\.tar\.gz//" |
+            grep -oP "${kernel_verpatch}\.[0-9]+(?=\.tar\.gz)" |
             sort -urV | head -n 1
     )"
     [[ -n "${latest_version}" ]] || error_msg "Failed to query kernel dtbs version from [ https://github.com/ophub/kernel ]."
@@ -419,9 +417,9 @@ chroot_fnnas() {
 
     # 1. Boot files
     cp -rf "${tmp_fnnas}/boot/"*${kernel_version} "${tmp_outpath}/boot/"
-    # 2. DTB files
-    cp -rf "${tmp_fnnas}/boot/dtb/${platform_name}/"* "${tmp_outpath}/dtb/"
+    # 2. DTB files: Based on flippy’s DTBs, use the official fnnas DTBs to overwrite files with the same names.
     cp -rf "${fnnas_dtbs}/${platform_name}/"* "${tmp_outpath}/dtb/"
+    cp -rf "${tmp_fnnas}/boot/dtb/${platform_name}/"* "${tmp_outpath}/dtb/"
     # 3. Modules
     cp -rf "${tmp_fnnas}/usr/lib/modules/${kernel_version}" "${tmp_outpath}/modules/"
     # 4. Headers
@@ -439,7 +437,13 @@ chroot_fnnas() {
     tar -czf "${out_path}/${kernel_out}/modules-${platform_name}-${kernel_version}.tar.gz" -C "${tmp_outpath}/modules" .
     tar -czf "${out_path}/${kernel_out}/header-${platform_name}-${kernel_version}.tar.gz" -C "${tmp_outpath}/headers" .
 
+    # Add sha256sum integrity verification file
+    echo -e "${INFO} Generating sha256sums file..."
+    cd "${out_path}/${kernel_out}/"
+    sha256sum * >sha256sums
+
     # Final packaging
+    cd "${current_path}"
     rm -f ${out_path}/${kernel_out}.tar.gz
     tar -czf "${out_path}/${kernel_out}.tar.gz" -C "${out_path}" "${kernel_out}"
     rm -rf "${out_path}/${kernel_out}"

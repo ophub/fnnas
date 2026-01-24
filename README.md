@@ -40,13 +40,15 @@ This project benefits from the hard work of numerous [contributors](https://gith
 | s905w | [X96-Mini](https://github.com/ophub/amlogic-s9xxx-armbian/issues/621), [TX3-Mini](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1062), [W95](https://github.com/ophub/amlogic-s9xxx-armbian/issues/570), [X96W/FunTV](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1044), [MXQ-Pro-4K](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1140), [MeCool-m8s-pro-W](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3245) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | s905 | [Beelink-Mini-MX-2G](https://github.com/ophub/amlogic-s9xxx-armbian/issues/127), [Sunvell-T95M](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/337), [MXQ-Pro+4K](https://github.com/ophub/amlogic-s9xxx-armbian/issues/715), [SumaVision-Q5](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1175) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | rk3588(s) | [Radxa-Rock5B](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1240), [Radxa-Rock5C](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2324), [Orange-Pi-5-Plus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2400), [Beelink-IPC-R](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/415), [HLink-H88K](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1726), [HLink-H88K-V3](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1726), [NanoPC-T6](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2453), [Smart-Am60](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2817), [DC-A588](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2988), [Orangepi-5B](https://github.com/ophub/amlogic-s9xxx-armbian/pull/3052), [CM3588-NAS](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3306) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
-| rk3399 | [EAIDK-610](https://github.com/ophub/amlogic-s9xxx-armbian/pull/991), [King3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1080), [TN3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1094), [Kylin3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1132), [ZCube1-Max](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1247), [CRRC](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1280), [SMART-AM40](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1317), [SW799](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1326), [ZYSJ](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1380), [DG-3399](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1492), [DLFR100](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1522), [Emb3531](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1549), [Leez-p710](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1609), [tvi3315a](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1687), [xiaobao](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1698), [Fine3399](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1790), [Firefly-RK3399](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/491), [LX-R3S](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2026), [Hugsun-x99](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2050), [Tb-ls3399](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2146), [Hisense-hs530r](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/572), [Tpm312](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2403), [ZK-rk39a](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2446), [YSKJ](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2673), [Fmx1-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2691), [Sv-33a6x](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/748), [AIO-3399b](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3185) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
+| rk3576 | [NanoPi-m5](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3207) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
+| rk3399 | [EAIDK-610](https://github.com/ophub/amlogic-s9xxx-armbian/pull/991), [King3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1080), [TN3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1094), [Kylin3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1132), [ZCube1-Max](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1247), [CRRC](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1280), [SMART-AM40](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1317), [SW799](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1326), [ZYSJ](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1380), [DG-3399](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1492), [DLFR100](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1522), [Emb3531](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1549), [Leez-p710](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1609), [tvi3315a](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1687), [xiaobao](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1698), [Fine3399](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1790), [Firefly-RK3399](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/491), [LX-R3S](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2026), [Hugsun-x99](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2050), [Tb-ls3399](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2146), [Hisense-hs530r](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/572), [Tpm312](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2403), [ZK-rk39a](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2446), [YSKJ](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2673), [Fmx1-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2691), [Sv-33a6x](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/748), [AIO-3399b](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3185), [TaraM](https://github.com/ophub/u-boot/pull/28) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | rk3568 | [FastRhino-R66S](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1061), [FastRhino-R68S](https://github.com/ophub/amlogic-s9xxx-armbian/issues/774), [Radxa-E25](https://wiki.radxa.com/Rock3/CM/CM3I/E25), [NanoPi-R5S](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1217), [NanoPi-R5C](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1217), [HLink-H66K](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1726), [HLink-H68K](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1726), [HLink-H69K](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1726), [Seewo-sv21](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2017), [Mrkaio-m68s](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2155), [Swan1-w28](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2407), [Ruisen-box](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2508), [DG-TN3568](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2661), [Alark35-3500](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2911), [MMBox-Anas3035](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2995), [Wocyber-A3](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2978), [Photonicat](https://github.com/ophub/amlogic-s9xxx-openwrt/pull/827), [NSY-G16-Plus](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/845), [NSY-G68-Plus](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/845), [BDY-G18-Pro](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/847), [Gzpeite-P01](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3221), [LZ-K3568](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3304) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
-| rk3566 | [Panther-X2](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1319), [JP-TvBox](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1867), [LCKFB-Taishan-Pi](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2538), [WXY-OEC-turbo-4g](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2736), [Station-M2](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/744) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
+| rk3566 | [Panther-X2](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1319), [JP-TvBox](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1867), [LCKFB-Taishan-Pi](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2538), [WXY-OEC-turbo-4g](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2736), [Station-M2](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/744), [Orange-Pi-3B](https://github.com/ophub/fnnas/issues/261) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | rk3528 | [HLink-H28K](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1726), [Radxa-E20C](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2324), [H96-Max-M2](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2404) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | rk3328 | [BeikeYun](https://github.com/ophub/amlogic-s9xxx-armbian/issues/852), [Chainedbox-L1-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1680), [Station-M1](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313), [Bqeel-MVR9](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313), [Renegade/Firefly](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1861) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | rk3318 | [RX3318-Box](https://github.com/ophub/amlogic-s9xxx-armbian/pull/2129) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 | h6 | [Vplus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1100), [Tanix-TX6](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1120), [TQC-A01](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1638) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
+| h618 | [OrangePi-Zero3](https://github.com/ophub/fnnas/issues/158) | [fnnas](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) |
 
 > [!TIP]
 > Currently, [s905 boxes](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173) can only be used from `TF/SD/USB`, while other box models support writing to `eMMC`. For more information, please check the [✅Supported Device List Instructions](make-fnnas/fnnas-files/common-files/etc/model_database.conf). You can refer to section 12.15 of the documentation for methods on [adding new supported devices](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/documents/README.md#1215-how-to-add-new-supported-devices).
@@ -63,22 +65,36 @@ Select the FnNAS system corresponding to your box model. View the corresponding 
 2. For `Amlogic` and `Allwinner` platforms, use tools like [Rufus](https://rufus.ie/) or [balenaEtcher](https://www.balena.io/etcher/) to write the system to a USB drive, then insert the prepared USB drive into the box. Check your router for a new device named 'debian' and find its IP address (e.g., `192.168.1.15`). Access http://192.168.1.15:5666 via a browser to enter the FnNAS account creation interface. After creating a custom account and logging into the FnNAS system, enable SSH in `System Settings` → `SSH`. Then use an SSH connection tool to enter the system terminal and enter the command:
 
 ```shell
+sudo -i
 fnnas-install
 ```
 
 | Optional | Default | Options | Description       |
 | -------- | ------- | ------- | ----------------- |
 | -m       | no      | yes/no  | Use mainline u-boot |
-| -a       | yes     | yes/no  | Use [ampart](https://github.com/7Ji/ampart) partition adjustment tool |
+| -a       | no      | yes/no  | Use [ampart](https://github.com/7Ji/ampart) partition adjustment tool |
 | -l       | no      | yes/no  | Show full device list |
 
 Example: `fnnas-install -m yes -a no`
+
+> [!TIP]
+> Partition option description: Customizing the system rootfs size is available when disk space exceeds 16GiB (Default: 16GiB).
+>
+> During the system re-installation process, the script automatically detects the partition structure on the eMMC. If a personal data partition (P3) is detected, Option `3` will be activated in the menu. Selecting this option strictly preserves the current partition table layout, thereby ensuring that the data within the P3 partition is not overwritten. Upon completion of the installation, you can directly mount and access the partition via the 'Storage Manager' interface in FnOS.
+
+| Optional | Description |
+| :------: | :---------- |
+| **1**    | Rootfs partition limit to **16GiB**.                           |
+| **2**    | **[default]** Rootfs partition expand to full disk (**100%**). |
+| **3**    | **Retain current Rootfs size** (Preserve P3 Data).             |
+| **≥16**  | Enter a number (**GiB**) to specify Rootfs partition size.     |
 
 - ### Update FnNAS Kernel
 
 Login to FnNAS system SSH terminal → Enter command:
 
 ```shell
+sudo -i
 fnnas-update
 ```
 
@@ -161,11 +177,12 @@ sudo apt-get install -y $(cat make-fnnas/script/ubuntu2404-make-fnnas-depends)
 
 | Parameter | Meaning     | Description |
 | ----      | ----------  | ----------  |
-| -b        | Board      | Specifies the device code to be compiled. For example, `-b s905x3` means compiling the device with code s905x3. Multiple devices can be connected with `_`, such as `-b s905x3_s905d`. Special values: `all` means compile all devices, `first50` means compile the first 50 in the device library, `from50` means start from the 51st to the last, `last20` means the last 20. Device code lists are detailed in the BOARD configuration item in [model_database.conf](make-fnnas/fnnas-files/common-files/etc/model_database.conf). Default value: `all` |
+| -b        | Board      | Specifies the device code to be compiled. For example, `-b s905x3` means compiling the device with code s905x3. Multiple devices can be connected with `_`, such as `-b s905x3_s905d`. Special values: `all` means compile all devices, `first50` means compile the first 50 in the device library, `range50_100` means start from the 51st to the 100th, `range100_150` means start from the 101st to the 150th, `last20` means the last 20. Device code lists are detailed in the BOARD configuration item in [model_database.conf](make-fnnas/fnnas-files/common-files/etc/model_database.conf). Default value: `all` |
 | -r        | KernelRepo | Specifies the `<owner>/<repo>` of the github.com kernel repository. Default value: `ophub/fnnas` |
 | -k        | Kernel     | Specify [kernel](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) name, such as `-k 6.6.12`. Connect multiple kernels with `_`, such as `-k 6.12.63_6.18.3`. |
 | -a        | AutoKernel | Sets whether to automatically adopt the latest version of the kernel in the same series. When set to `true`, it will automatically check the kernel library for a newer version of the kernel specified in `-k`, such as 6.12.63. If there is a newer version after 6.12.63, it will automatically switch to the latest version. When set to `false`, the specified version kernel will be compiled. Default value: `true` |
 | -s        | Size       | Set the size(Unit: MiB) of the system's image partitions. When setting only the `ROOTFS` partition size, you can specify a single value, for example: `-s 6144`. When setting both `BOOTFS` and `ROOTFS` partition sizes, use / to connect the two values, for example: `-s 512/6144`. The default value is `512/6144` |
+| -e        | RootfsExpand | Set the automatic expansion size (Unit: GiB) of the system root partition. Default value: `16` |
 | -n        | BuilderName | Set the Armbian system builder signature. Do not include spaces when setting the signature. Default value: `None` |
 
 - `sudo ./renas` : Use default configuration to package for `all` models of TV boxes.
@@ -176,21 +193,23 @@ sudo apt-get install -y $(cat make-fnnas/script/ubuntu2404-make-fnnas-depends)
 - `sudo ./renas -b s905x3_s905d` : Use default configuration to package all kernels for multiple models of TV boxes, use `_` to connect multiple models.
 - `sudo ./renas -k 6.12.63_6.18.3` : Use default configuration, specify multiple kernels to package for all models of TV boxes, kernel packages connected with `_`.
 - `sudo ./renas -k 6.12.63_6.18.3 -a true` : Use default configuration, specify multiple kernels to package for all models of TV boxes, kernel packages connected with `_`. Automatically upgrade to the latest kernel of the same series.
+- `sudo ./renas -b s905x3 -e 32` : Use default configuration to package for `s905x3` model of TV box, set rootfs automatic expansion size to `32` GiB.
 
 ## Use GitHub Actions for Packaging fnnas image
 
 1. Workflow configuration files are located in [.github/workflows](.github/workflows).
 
-2. Select `Build FnNAS` on the Actions page to compile using [build-fnnas-using-official-image.yml](.github/workflows/build-fnnas-using-official-image.yml). Click the `Run workflow` button to compile. In the options panel, you can set the FnNAS image file path in `Set fnnas image file path`, e.g., `https://fnnas.com/.../fnos_arm_1.0.0_258.img.xz` or other network download addresses. If not set, the official image saved in [ophub/fnnas](https://github.com/ophub/fnnas/releases/tag/fnnas_base_image) will be used by default.
+2. Select `Build FnNAS Image` on the Actions page to compile using [build-fnnas-image.yml](.github/workflows/build-fnnas-image.yml). Click the `Run workflow` button to compile. In the options panel, you can set the FnNAS image file path in `Custom fnnas image download url`, e.g., `https://fnnas.com/.../fnos_arm_1.0.0_258.img.xz` or other network download addresses. If not set, the official image saved in [fnnas_base_image](https://github.com/ophub/fnnas/releases/tag/fnnas_base_image) will be used by default.
 
 ```yaml
-- name: Build FnNAS
+- name: Build FnNAS Image
   uses: ophub/fnnas@main
   with:
     build_target: fnnas
     fnnas_path: fnnas/*.img.xz
     fnnas_board: s905d_s905x3_s922x_s905x
     fnnas_kernel: 6.12.y
+    rootfs_expand: 16
 ```
 
 - ### GitHub Actions Packaging fnnas Image
@@ -201,10 +220,11 @@ The related parameters correspond to the `local packaging command`, please refer
 |-----------------|---------------|---------------------------------------------------------|
 | fnnas_path      | None          | Set the path of the official Arm64 original FnNAS image file. Supports using file paths in the current workflow like `fnnas/*.img.xz`, and also supports network download addresses like: `https://fnnas.com/.../fnos_arm_1.0.0_258.img.xz` |
 | fnnas_board     | all           | Set the board for packaging boxes. Function refers to `-b` |
-| kernel_repo     | ophub/fnnas  | Specify the `<owner>/<repo>` of the github.com kernel repository. Function refers to `-r` |
+| kernel_repo     | ophub/fnnas   | Specify the `<owner>/<repo>` of the github.com kernel repository. Function refers to `-r` |
 | fnnas_kernel    | 6.12.y        | Set the [version](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) of the kernel. Function refers to `-k` |
 | auto_kernel     | true          | Set whether to automatically adopt the latest version of the kernel in the same series. Function refers to `-a` |
 | fnnas_size      | 512/6144      | Set the size of the system `BOOTFS` and `ROOTFS` partitions. Function refers to `-s` |
+| rootfs_expand   | 16            | Set the automatic expansion size (Unit: GiB) of the system root partition. Function refers to `-e` |
 | builder_name    | None          | Set the FnNAS system `builder signature`. Function refers to `-n` |
 
 - ### Explanation of Parameters for Local FnNAS Kernel Build
@@ -212,7 +232,7 @@ The related parameters correspond to the `local packaging command`, please refer
 | Parameter | Meaning | Description |
 | :-------- | :------ | :---------- |
 | -r | debs_repo | Specifies the `<owner>/<repo>` of the debs kernel repository on github.com. Default value: `ophub/fnnas` |
-| -k | debs_version | Specifies the [kernel](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) name/version, e.g., `-k 6.12.63`. Default value: `6.12.y` |
+| -k | dtbs_version | Specifies the [kernel](https://github.com/ophub/fnnas/releases/tag/kernel_fnnas) name/version, e.g., `-k 6.12.63`. Default value: `6.12.y` |
 | -e | debs_install | Sets whether to install official `.deb` kernel packages for different platforms. Options: `amlogic` / `rockchip` / `allwinner` / `none`. Default value: `none` |
 | -t | dtbs_install | Sets whether to install additional `dtbs` files missing from the official release. Options: `true` / `false`. Default value: `false` |
 
@@ -223,15 +243,15 @@ The related parameters correspond to the `local packaging command`, please refer
 
 ## Compiling fnnas Kernel using GitHub Actions
 
-For details on how to compile the FnNAS-specific kernel, please refer to the instructions in [compile-kernel](.github/workflows/build-fnnas-kernel.yml).
+For details on how to compile the FnNAS-specific kernel, please refer to the instructions in [build-fnnas-kernel.yml](.github/workflows/build-fnnas-kernel.yml).
 
 ```yaml
-- name: Compile fnnas kernel
+- name: Build FnNAS Kernel
   uses: ophub/fnnas@main
   with:
     build_target: kernel
     fnnas_path: fnnas/*.img
-    debs_version: 6.12.y
+    dtbs_version: 6.12.y
     debs_install: amlogic
     dtbs_install: true
 ```
@@ -242,7 +262,7 @@ The relevant parameters correspond to the `local packaging command`. Please refe
 |------------------|---------------|----------------------------------------------|
 | fnnas_path       | None          | Sets the path to the official original Arm64 FnNAS image file. |
 | debs_repo        | ophub/fnnas   | Sets the `<owner>/<repo>` of the debs kernel repository on github.com. Refer to `-r` for functionality. |
-| debs_version     | 6.12.y        | Sets the kernel version. Refer to `-k` for functionality. |
+| dtbs_version     | 6.12.y        | Sets the kernel version. Refer to `-k` for functionality. |
 | debs_install     | none          | Sets whether to install official kernel packages in `.deb` format. Refer to `-e` for functionality. |
 | dtbs_install     | false         | Sets whether to install additional `dtbs` files missing from the official release. Refer to `-t` for functionality. |
 

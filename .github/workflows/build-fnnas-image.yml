@@ -9,15 +9,32 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
+      fnnas_base_version:
+        description: "Select fnnas base image version"
+        required: false
+        default: "amlogic_389"
+        type: choice
+        options:
+          - amlogic_389
+          - amlogic_338
+          - amlogic_322
+          - amlogic_300
+          - allwinner_335
+          - allwinner_317
+          - rockchip_388
+          - rockchip_330
+          - rockchip_321
+          - rockchip_296
       fnnas_board:
-        description: "Select device board"
+        description: "Select fnnas device board"
         required: false
         default: "all"
         type: choice
         options:
           - all
           - first50
-          - from50
+          - range50_100
+          - range100_150
           - last20
           - a311d-oes_s922x-oes-plus_wxy-oect
           - nsy-g16-plus_nsy-g68-plus_bdy-g18-pro
@@ -43,6 +60,7 @@ on:
           - fine3399
           - firefly-rk3399
           - fmx1-pro
+          - fmx1-pro-b
           - gzpeite-p01
           - h28k
           - h66k
@@ -63,12 +81,15 @@ on:
           - lz-k3568
           - mrkaio-m68s
           - nanopc-t6
+          - nanopi-m5
           - nanopi-r5c
           - nanopi-r5s
           - nsy-g16-plus
           - nsy-g68-plus
+          - orangepi-3b
           - orangepi-5-plus
           - orangepi-5b
+          - orangepi-zero3
           - panther-x2
           - photonicat
           - r66s
@@ -171,6 +192,7 @@ on:
           - sv-33a6x
           - swan1-w28
           - sw799
+          - taram
           - tanix-tx6
           - tb-ls3399
           - tn3399
@@ -186,48 +208,42 @@ on:
           - zcube1-max
           - zk-r39a
           - zysj
+      kernel_repo:
+        description: "Set fnnas kernel repository"
+        required: false
+        default: "ophub/fnnas"
+        type: choice
+        options:
+          - ophub/fnnas
       fnnas_kernel:
-        description: "Select kernel version"
+        description: "Select fnnas kernel version"
         required: false
         default: "6.12.y"
         type: choice
         options:
           - 6.12.y
+          - 6.18.y
+          - 6.12.y_6.18.y
       auto_kernel:
         description: "Auto use the latest kernel"
         required: false
         default: true
         type: boolean
-      kernel_repo:
-        description: "Set the kernel repository"
+      rootfs_expand:
+        description: "Set rootfs expansion size(GiB)"
         required: false
         default: "ophub/fnnas"
         type: choice
         options:
           - ophub/fnnas
           - xcodebin/fnnas
+        default: "16"
       fnnas_url:
-        description: "Set fnnas image file path"
+        description: "Custom fnnas image download url"
         required: false
         default: ""
-      fnnas_base_version:
-        description: "Select the fnnas base image version"
-        required: false
-        default: "amlogic_300"
-        type: choice
-        options:
-          - amlogic_300
-          - rockchip_296
-      fnnas_storage:
-        description: "Select image storage type."
-        required: false
-        default: "save"
-        type: choice
-        options:
-          - save
-          - temp
       builder_name:
-        description: "Set OpenWrt builder signature."
+        description: "Set fnnas builder signature"
         required: false
         default: "ophub"
         type: choice
@@ -242,7 +258,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
+    if: ${{ github.event.repository.owner.id == github.event.sender.id }}
 
     steps:
       - name: Checkout
@@ -293,7 +309,7 @@ jobs:
           df -Th
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Download fnnas image file
+      - name: Download fnnas image [ ${{ inputs.fnnas_base_version }} ]
         id: down
         working-directory: /builder
         if: (!cancelled())
@@ -305,6 +321,8 @@ jobs:
 
           input_url="${{ inputs.fnnas_url }}"
           fnnas_base_version="${{ inputs.fnnas_base_version }}"
+          fnnas_img_id="${fnnas_base_version##*_}"
+          [[ -n "${fnnas_img_id}" ]] && build_tag="fnnas_v${fnnas_img_id}" || build_tag="fnnas_save"
 
           # -------------------------------------------------------
           # Case A: URL specified
@@ -393,14 +411,15 @@ jobs:
 
           [[ "${?}" -ne "0" ]] && echo "Download failed." && exit 1
 
-          echo "build_tag=fnnas_${{ inputs.fnnas_storage }}_$(date +"%Y.%m")" >> ${GITHUB_ENV}
+          # Add directory links
           ln -sf /builder/fnnas ${{ github.workspace }}/fnnas
           ln -sf /builder/fnnas /home/runner/work/_actions/ophub/fnnas/main/fnnas
 
+          echo "build_tag=${build_tag}" >> ${GITHUB_ENV}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Packaging fnnas
-        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
+        if: ${{ steps.down.outputs.status == 'success' && !cancelled() }}
         uses: ophub/fnnas@main
         with:
           fnnas_path: fnnas/*.img.xz
@@ -408,11 +427,12 @@ jobs:
           fnnas_kernel: ${{ inputs.fnnas_kernel }}
           auto_kernel: ${{ inputs.auto_kernel }}
           kernel_repo: ${{ inputs.kernel_repo }}
+          rootfs_expand: ${{ inputs.rootfs_expand }}
           builder_name: ${{ inputs.builder_name }}
 
       - name: Upload the packaged fnnas
         uses: ncipollo/release-action@main
-        if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
+        if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() }}
         with:
           tag: ${{ env.build_tag }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
@@ -422,7 +442,9 @@ jobs:
           makeLatest: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            - Based on the official fnnas.com Arm64 release, preserving the complete stock experience.
-            - Extends support to a wider range of Amlogic, Rockchip, and Allwinner devices.
-            - 基于 fnnas.com 官方 Arm64 镜像构建，完整保留官方原版系统体验。
-            - 扩展支持更多基于 Amlogic、Rockchip 及 Allwinner 平台的设备。
+            - Built based on the fnnas.com [official Arm64 image](https://github.com/ophub/fnnas/releases/tag/fnnas_base_image),
+              fully preserving the original official system experience.
+              Extends support to a wider range of Amlogic, Rockchip, and Allwinner devices.
+            - 基于 fnnas.com [官方 Arm64 镜像](https://github.com/ophub/fnnas/releases/tag/fnnas_base_image) 构建，
+              完整保留官方原版系统体验。
+              扩展支持更多基于 Amlogic、Rockchip 及 Allwinner 平台的设备。

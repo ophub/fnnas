@@ -74,6 +74,8 @@ host_release="$(cat /etc/os-release | grep '^VERSION_CODENAME=.*' | cut -d'=' -f
 board_release_file="etc/fnnas-board-release.conf"
 # Add custom fnnas firmware information
 ophub_release_file="etc/ophub-release"
+# Add fnnas configuration file
+fnnas_conf="etc/fnnas.conf"
 
 # Dependency files download repository
 depends_repo="https://github.com/ophub/amlogic-s9xxx-armbian"
@@ -85,9 +87,13 @@ firmware_repo="https://github.com/ophub/firmware"
 # Set the kernel download repository from github.com
 kernel_repo="https://github.com/ophub/fnnas"
 # Set the list of kernels used by default(Selectable version)
-stable_kernel=("6.12.y")
+rockchip_kernel=("6.12.y")
+amlogic_kernel=("6.12.y" "6.18.y")
+allwinner_kernel=("6.12.y")
 # Set to automatically use the latest kernel
 auto_kernel="true"
+# Initialize the kernel array
+declare -A tags_list
 
 # Set the Amlogic's u-boot series(u-boot-xxx.bin)
 uboot_meson_gxl=("p201.bin" "p212.bin" "s905x-s912.bin" "n1.bin" "r3300l.bin")
@@ -102,6 +108,8 @@ make_board="all"
 # Set fnnas firmware size (Unit: MiB, boot_mb >= 512, root_mb >= 6144)
 boot_mb="512"
 root_mb="6144"
+# Set automatic expansion size for the system root partition (Unit: GiB)
+rootfs_expand="16"
 # Set fnnas builder signature
 builder_name=""
 
@@ -138,7 +146,7 @@ mount_try() {
     while [[ "${t}" -le "${max_try}" ]]; do
         # Mount according to the image partition format
         if [[ "${m_type}" == "btrfs" ]]; then
-            mount -t ${m_type} -o discard,compress=zstd:6 ${m_dev} ${m_target} 2>/dev/null
+            mount -t ${m_type} -o discard,compress=zstd:1 ${m_dev} ${m_target} 2>/dev/null
         else
             mount -t ${m_type} -o discard ${m_dev} ${m_target} 2>/dev/null
         fi
@@ -166,7 +174,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    local options="b:r:k:a:p:s:n:"
+    local options="b:r:k:a:e:s:n:"
     parsed_args=$(getopt -o "${options}" -- "${@}")
     [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
     eval set -- "${parsed_args}"
@@ -193,7 +201,8 @@ init_var() {
             if [[ -n "${2}" ]]; then
                 oldIFS="${IFS}"
                 IFS="_"
-                stable_kernel=(${2})
+                amlogic_kernel=(${2})
+                specific_kernel=(${2})
                 IFS="${oldIFS}"
                 shift 2
             else
@@ -206,6 +215,14 @@ init_var() {
                 shift 2
             else
                 error_msg "Invalid -a parameter [ ${2} ]!"
+            fi
+            ;;
+        -e | --RootfsExpand)
+            if [[ -n "${2}" ]]; then
+                rootfs_expand="${2}"
+                shift 2
+            else
+                error_msg "Invalid -e parameter [ ${2} ]!"
             fi
             ;;
         -s | --Size)
@@ -253,7 +270,7 @@ check_data() {
     [[ -f "${model_conf}" ]] || error_msg "Missing model config file: [ ${model_conf} ]"
 
     # Get a list of build devices
-    if [[ "${make_board}" =~ ^(all|first50|from50|last20)$ ]]; then
+    if [[ "${make_board}" =~ ^(all|first50|range50_100|range100_150|last20)$ ]]; then
         board_list=":(yes)"
         make_fnnas=($(
             cat ${model_conf} |
@@ -267,14 +284,19 @@ check_data() {
     fi
     [[ "${#make_fnnas[@]}" -eq 0 ]] && error_msg "The board is missing, stop making."
 
-    # Select the first 50 boards (Index 0-49)
+    # Select the first 50 boards
     [[ "${make_board}" == "first50" ]] && {
         make_fnnas=("${make_fnnas[@]:0:50}")
         board_list=":($(echo ${make_fnnas[@]} | sed -e 's/ /\|/g')):(yes|no)"
     }
-    # Select the remaining boards starting from the 51st (Skip first 50)
-    [[ "${make_board}" == "from50" ]] && {
-        make_fnnas=("${make_fnnas[@]:50}")
+    # Select boards from 51st to 100th
+    [[ "${make_board}" == "range50_100" ]] && {
+        make_fnnas=("${make_fnnas[@]:50:50}")
+        board_list=":($(echo ${make_fnnas[@]} | sed -e 's/ /\|/g')):(yes|no)"
+    }
+    # Select boards from 101st to 150th
+    [[ "${make_board}" == "range100_150" ]] && {
+        make_fnnas=("${make_fnnas[@]:100:50}")
         board_list=":($(echo ${make_fnnas[@]} | sed -e 's/ /\|/g')):(yes|no)"
     }
     # Select the last 20 boards
@@ -283,14 +305,57 @@ check_data() {
         board_list=":($(echo ${make_fnnas[@]} | sed -e 's/ /\|/g')):(yes|no)"
     }
 
-    # Get the kernel array(amlogic/rockchip/allwinner) from the model configuration file
+    # Get the kernel array from the model configuration file
     kernel_from=($(
         cat ${model_conf} |
             sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' |
-            grep -E "^[^#].*${board_list}$" | awk -F':' '{print $10}' |
+            grep -E "^[^#].*${board_list}$" | awk -F':' '{print $9}' |
             sort -u | xargs
     ))
-    [[ "${#kernel_from[@]}" -eq 0 ]] && error_msg "Missing [ PLATFORM ] settings, stop building."
+    [[ "${#kernel_from[@]}" -eq 0 ]] && error_msg "Missing [ KERNEL_TAGS ] settings, stop building."
+
+    # Convert the kernel_from to the kernel array
+    for item in "${kernel_from[@]}"; do
+        # Split the key and value
+        IFS='/' read -r key value <<<"${item}"
+
+        # Check if the value is "all".
+        if [[ "${value}" == "all" ]]; then
+            # If the value is "all", assign the value of ${key}_kernel. such as [ amlogic_kernel, rockchip_kernel, etc. ]
+            eval "value=\"\${${key}_kernel[@]}\""
+        elif [[ "${value}" =~ ^[1-9]+ ]]; then
+            IFS='_' read -ra value <<<"${value}"
+            value="${value[@]}"
+        fi
+
+        # If auto_kernel is false, use the value from -k parameter
+        if [[ ! "${auto_kernel}" =~ ^(true|yes)$ ]]; then
+            if [[ "${#specific_kernel[@]}" -eq 0 ]]; then
+                error_msg "Plase use the -k parameter to specify the kernel version."
+            else
+                value="${specific_kernel[@]}"
+            fi
+        fi
+
+        # Merge the same key values
+        if [[ -n "${tags_list[${key}]}" ]]; then
+            tags_list[${key}]+=" ${value}"
+        else
+            tags_list[${key}]="${value}"
+        fi
+    done
+
+    # Convert the tags_list array to the kernel array (remove duplicates)
+    for key in "${!tags_list[@]}"; do
+        # Convert the space-separated string to an array and remove duplicates
+        read -ra unique_values <<<"$(echo "${tags_list[${key}]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')"
+        # Assign the unique values back to the tags_list
+        tags_list[${key}]="${unique_values[@]}"
+    done
+
+    # Check the kernel tags list
+    [[ "${#tags_list[@]}" -eq 0 ]] && error_msg "The [ tags_list ] is missing, stop building."
+    echo -e "${INFO} The kernel tags list: [ ${!tags_list[@]} ]"
 
     # Convert kernel repository address to api format
     [[ "${kernel_repo}" =~ ^https: ]] && kernel_repo="$(echo ${kernel_repo} | awk -F'/' '{print $4"/"$5}')"
@@ -334,24 +399,30 @@ download_depends() {
     echo -e "${STEPS} Start downloading dependency files..."
 
     # Download u-boot files
-    git_path="$(mktemp -d)"
-    git_pull_dir ${uboot_repo} main ${git_path}
-    # Move the u-boot files to the storage directory
-    mkdir -p ${uboot_path}
-    cp -af --no-preserve=ownership ${git_path}/u-boot/. ${uboot_path}
-    [[ "${?}" -eq 0 ]] && echo -e "${INFO} fnnas: u-boot download completed." || error_msg "fnnas: u-boot download failed."
-    # Delete temporary files
-    rm -rf ${git_path}
+    uboot_num="$(find "${uboot_path}/rockchip" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)"
+    [[ -n "${uboot_num}" && "${uboot_num}" -le "5" ]] && {
+        git_path="$(mktemp -d)"
+        git_pull_dir ${uboot_repo} main ${git_path}
+        # Move the u-boot files to the storage directory
+        mkdir -p ${uboot_path}
+        cp -af --no-preserve=ownership ${git_path}/u-boot/. ${uboot_path}
+        [[ "${?}" -eq 0 ]] && echo -e "${INFO} fnnas: u-boot download completed." || error_msg "fnnas: u-boot download failed."
+        # Delete temporary files
+        rm -rf ${git_path}
+    } || echo -e "${INFO} fnnas: u-boot directory is not empty, skip download."
 
     # Download firmware files
-    git_path="$(mktemp -d)"
-    git_pull_dir ${firmware_repo} main ${git_path}
-    # Move the firmware files to the storage directory
-    mkdir -p ${firmware_path}
-    cp -af --no-preserve=ownership ${git_path}/firmware/. ${firmware_path}
-    [[ "${?}" -eq 0 ]] && echo -e "${INFO} fnnas: firmware download completed." || error_msg "fnnas: firmware download failed."
-    # Delete temporary files
-    rm -rf ${git_path}
+    firmware_num="$(find "${firmware_path}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)"
+    [[ -n "${firmware_num}" && "${firmware_num}" -le "5" ]] && {
+        git_path="$(mktemp -d)"
+        git_pull_dir ${firmware_repo} main ${git_path}
+        # Move the firmware files to the storage directory
+        mkdir -p ${firmware_path}
+        cp -af --no-preserve=ownership ${git_path}/firmware/. ${firmware_path}
+        [[ "${?}" -eq 0 ]] && echo -e "${INFO} fnnas: firmware download completed." || error_msg "fnnas: firmware download failed."
+        # Delete temporary files
+        rm -rf ${git_path}
+    } || echo -e "${INFO} fnnas: firmware directory is not empty, skip download."
 
     # Download Armbian repository files
     git_path="$(mktemp -d)"
@@ -364,10 +435,6 @@ download_depends() {
     # Move the different files to the storage directory
     cp -af --no-preserve=ownership ${git_path}/build-armbian/armbian-files/different-files/. ${different_files}
     [[ "${?}" -eq 0 ]] && echo -e "${INFO} fnnas: different-files download completed." || error_msg "fnnas: different-files download failed."
-    # Move the balethirq related files to the storage directory
-    cp -f --no-preserve=ownership ${git_path}/build-armbian/armbian-files/common-files/usr/sbin/balethirq.pl ${common_files}/usr/sbin
-    cp -f --no-preserve=ownership ${git_path}/build-armbian/armbian-files/common-files/etc/balance_irq ${common_files}/etc
-    [[ "${?}" -eq 0 ]] && echo -e "${INFO} fnnas: balethirq download completed." || error_msg "fnnas: balethirq download failed."
     # Delete temporary files
     rm -rf ${git_path}
 }
@@ -376,72 +443,108 @@ query_kernel() {
     echo -e "${STEPS} Start querying the latest kernel version..."
 
     # Check the version on the kernel repository
-    tmp_arr_kernels=()
-    i=1
-    for kernel_var in "${stable_kernel[@]}"; do
-        echo -e "${INFO} (${i}) Auto query the latest kernel version for [ ${kernel_var} ]"
+    x="1"
+    for key in "${!tags_list[@]}"; do
+        {
+            # Query the name of the latest kernel version
+            tmp_arr_kernels=()
+            down_kernel_list=(${tags_list[${key}]})
+            i=1
+            for kernel_var in "${down_kernel_list[@]}"; do
+                echo -e "${INFO} (${x}.${i}) Auto query the latest kernel version for [ ${key} - ${kernel_var} ]"
 
-        # Identify the kernel <VERSION> and <PATCHLEVEL>, such as [ 6.1 ]
-        kernel_verpatch="$(echo ${kernel_var} | awk -F '.' '{print $1"."$2}')"
+                # Identify the kernel <VERSION> and <PATCHLEVEL>, such as [ 6.1 ]
+                kernel_verpatch="$(echo ${kernel_var} | awk -F '.' '{print $1"."$2}')"
 
-        # Query the latest kernel version
-        latest_version="$(
-            curl -fsSL \
-                ${kernel_api}/releases/expanded_assets/kernel_fnnas |
-                grep -oE "${kernel_verpatch}\.[0-9]+(-[a-zA-Z0-9]+)?\.tar\.gz" |
-                sed -E 's/(-[a-zA-Z0-9]+)?\.tar\.gz//' |
-                sort -urV | head -n 1
-        )"
+                # Query the latest kernel version
+                latest_version="$(
+                    curl -fsSL \
+                        ${kernel_api}/releases/expanded_assets/kernel_fnnas |
+                        grep -oP "${kernel_verpatch}\.[0-9]+(?=-${key}\.tar\.gz)" |
+                        sort -urV | head -n 1
+                )"
 
-        if [[ "${?}" -eq 0 && -n "${latest_version}" ]]; then
-            tmp_arr_kernels[${i}]="${latest_version}"
-        else
-            tmp_arr_kernels[${i}]="${kernel_var}"
-        fi
+                if [[ "${?}" -eq 0 && -n "${latest_version}" ]]; then
+                    tmp_arr_kernels[${i}]="${latest_version}"
+                else
+                    tmp_arr_kernels[${i}]="${kernel_var}"
+                fi
 
-        echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is latest kernel. \n"
+                echo -e "${INFO} (${x}.${i}) [ ${key} - ${tmp_arr_kernels[$i]} ] is latest kernel. \n"
 
-        ((i++))
+                ((i++))
+            done
+
+            # Assign the latest kernel version to the array
+            tags_list[${key}]="${tmp_arr_kernels[@]}"
+
+            ((x++))
+        }
     done
+}
 
-    # Set the latest kernel array
-    stable_kernel=("${tmp_arr_kernels[@]}")
+check_kernel() {
+    [[ -n "${1}" ]] && check_path="${1}" || error_msg "Invalid kernel path to check."
+    check_files=($(cat "${check_path}/sha256sums" | awk '{print $2}'))
+    for cf in "${check_files[@]}"; do
+        {
+            # Check if file exists
+            [[ -s "${check_path}/${cf}" ]] || error_msg "The [ ${cf} ] file is missing."
+            # Check if the file sha256sum is correct
+            tmp_sha256sum="$(sha256sum "${check_path}/${cf}" | awk '{print $1}')"
+            tmp_checkcode="$(cat ${check_path}/sha256sums | grep ${cf} | awk '{print $1}')"
+            [[ "${tmp_sha256sum}" == "${tmp_checkcode}" ]] || error_msg "[ ${cf} ]: sha256sum verification failed."
+        }
+    done
+    echo -e "${INFO} All [ ${#check_files[@]} ] kernel files are sha256sum checked to be complete.\n"
 }
 
 download_kernel() {
     cd ${current_path}
     echo -e "${STEPS} Start downloading the kernel files..."
 
-    # Download the kernel to the storage directory
-    i="1"
-    for kernel_var in "${stable_kernel[@]}"; do
-        for key in "${kernel_from[@]}"; do
-            kernel_down_from="https://github.com/${kernel_repo}/releases/download/kernel_fnnas/${kernel_var}-${key}.tar.gz"
+    x="1"
+    for key in "${!tags_list[@]}"; do
+        {
+            down_kernel_list=(${tags_list[${key}]})
+            # Download the kernel to the storage directory
+            i="1"
+            for kernel_var in "${down_kernel_list[@]}"; do
+                if [[ ! -d "${kernel_path}/${kernel_var}/${kernel_var}-${key}" ]]; then
+                    kernel_down_from="https://github.com/${kernel_repo}/releases/download/kernel_fnnas/${kernel_var}-${key}.tar.gz"
+                    echo -e "${INFO} (${x}.${i}) [ ${key} - ${kernel_var} ] Kernel download from [ ${kernel_down_from} ]"
 
-            # Download the kernel files. If the download fails, try again 10 times.
-            if [[ ! -d "${kernel_path}/${kernel_var}/${kernel_var}-${key}" ]]; then
-                echo -e "${INFO} (${i}) [ ${kernel_var} - ${key} ] Kernel download from [ ${kernel_down_from} ]"
-                mkdir -p "${kernel_path}/${kernel_var}"
-                for t in {1..10}; do
-                    curl -fsSL "${kernel_down_from}" -o "${kernel_path}/${kernel_var}/${kernel_var}-${key}.tar.gz"
-                    [[ "${?}" -eq 0 ]] && break || sleep 60
-                done
-                [[ "${?}" -eq 0 ]] || error_msg "Failed to download the kernel files from the server."
+                    # Download the kernel files. If the download fails, try again 10 times.
+                    [[ -d "${kernel_path}/${key}" ]] || mkdir -p ${kernel_path}/${key}
+                    [[ -d "${kernel_path}/${kernel_var}" ]] || mkdir -p ${kernel_path}/${kernel_var}
+                    for t in {1..10}; do
+                        curl -fsSL "${kernel_down_from}" -o "${kernel_path}/${key}/${kernel_var}-${key}.tar.gz"
+                        [[ "${?}" -eq 0 ]] && break || sleep 60
+                    done
+                    [[ "${?}" -eq 0 ]] || error_msg "Failed to download the kernel files from the server."
 
-                # Decompress the kernel files
-                tar -mxzf "${kernel_path}/${kernel_var}/${kernel_var}-${key}.tar.gz" -C "${kernel_path}/${kernel_var}"
-                [[ "${?}" -eq 0 ]] || error_msg "[ ${kernel_var} ] kernel decompression failed."
-            else
-                echo -e "${INFO} (${i}) [ ${kernel_var} - ${key} ] Kernel file already exists, skip download."
-            fi
-        done
+                    # Decompress the kernel files
+                    tar -mxzf "${kernel_path}/${key}/${kernel_var}-${key}.tar.gz" -C "${kernel_path}/${kernel_var}"
+                    [[ "${?}" -eq 0 ]] || error_msg "[ ${kernel_var} ] kernel decompression failed."
+                else
+                    echo -e "${INFO} (${x}.${i}) [ ${key} - ${kernel_var} ] Kernel is in the local directory."
+                fi
 
-        ((i++))
+                # If the kernel contains the sha256sums file, check the files integrity
+                [[ -f "${kernel_path}/${kernel_var}/${kernel_var}-${key}/sha256sums" ]] && {
+                    check_kernel "${kernel_path}/${kernel_var}/${kernel_var}-${key}"
+                }
+
+                ((i++))
+            done
+
+            # Delete downloaded kernel temporary directory
+            rm -rf ${kernel_path}/${key}
+            sync
+
+            ((x++))
+        }
     done
-
-    # Delete downloaded kernel temporary files
-    rm -f ${kernel_path}/${kernel_var}/*.tar.gz
-    sync
 }
 
 confirm_version() {
@@ -489,6 +592,37 @@ confirm_version() {
     # Set the Amlogic u-boot series
     family_rename="${FAMILY//-/_}"
     eval "amlogic_uboot=(\${uboot_${family_rename}[@]})"
+
+    # Get the kernel tags and version
+    conf_kernel_tags="${KERNEL_TAGS%%/*}"
+    conf_kernel_list="${KERNEL_TAGS##*/}"
+    # Check the kernel tags and version
+    [[ -z "${conf_kernel_tags}" ]] && error_msg "The [ ${KERNEL_TAGS} ] is missing tags part."
+    [[ -z "${conf_kernel_list}" ]] && error_msg "The [ ${KERNEL_TAGS} ] is missing list part."
+
+    # Find the kernel list defined in the model database
+    model_kernel=()
+    if [[ "${conf_kernel_list}" == "all" ]]; then
+        eval "model_kernel=(\"\${${conf_kernel_tags}_kernel[@]}\")"
+        model_kernel=($(echo "${model_kernel[@]}" | xargs -n1 | sed -E 's/^([0-9]+\.[0-9]+)(\.[a-z0-9]+)?$/\1.[0-9]+/'))
+    else
+        # Convert the string into an array, using "_" as the delimiter
+        IFS='_' read -ra conf_kernel_list <<<"${conf_kernel_list}"
+        model_kernel=($(echo "${conf_kernel_list[@]}" | xargs -n1 | sed -E 's/^([0-9]+\.[0-9]+)(\.[a-z0-9]+)?$/\1.[0-9]+/'))
+    fi
+    # Check the kernel list
+    [[ "${#model_kernel[@]}" -eq 0 ]] && error_msg "The kernel list is empty for [ ${board} ]"
+
+    # Find the kernel version that matches the custom version
+    build_kernel=()
+    latest_kernel=(${tags_list[${conf_kernel_tags}]})
+    for ck in "${model_kernel[@]}"; do
+        for lk in "${latest_kernel[@]}"; do
+            [[ "${lk}" =~ ^${ck}$ ]] && build_kernel+=("${lk}")
+        done
+    done
+    # Check the kernel version
+    [[ "${#build_kernel[@]}" -eq 0 ]] && error_msg "The kernel list is invalid for [ ${board} ]"
 }
 
 extract_fnnas() {
@@ -577,6 +711,8 @@ make_image() {
     BOOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
     [[ -z "${BOOT_UUID}" ]] && BOOT_UUID="$(uuidgen)"
     [[ -z "${BOOT_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
+    FAT_ID_RAW=$(echo "${BOOT_UUID}" | tr -d '-' | cut -c1-8)
+    FAT_ID_FSTAB=$(echo "${FAT_ID_RAW}" | awk '{print toupper(substr($0,1,4) "-" substr($0,5,4))}')
     # Confirm ROOTFS_UUID
     ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
     [[ -z "${ROOTFS_UUID}" ]] && ROOTFS_UUID="$(uuidgen)"
@@ -584,7 +720,7 @@ make_image() {
 
     # Format bootfs partition
     if [[ "${bootfs_type}" == "fat32" ]]; then
-        mkfs.vfat -F 32 -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
+        mkfs.vfat -F 32 -i "${FAT_ID_RAW}" -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
     else
         mkfs.ext4 -F -q -U ${BOOT_UUID} -L "BOOT" -b 4k -m 0 ${loop_new}p1 >/dev/null 2>&1
     fi
@@ -643,6 +779,14 @@ make_image() {
             #echo -e "${INFO} 02. For [ ${board} ] write bootloader: ${BOOTLOADER_IMG}"
         fi
     }
+
+    # Set partition names
+    if [[ "${partition_table_type}" == "msdos" ]]; then
+        dd if=/dev/urandom of="${loop_new}" bs=1 count=4 seek=440 conv=notrunc status=none
+    elif [[ "${partition_table_type}" == "gpt" ]]; then
+        parted -s "${build_image_file}" name 1 BOOT 2>/dev/null
+        parted -s "${build_image_file}" name 2 ROOTFS 2>/dev/null
+    fi
 
     # Special procedures for flashing specific boards
     [[ "${write_board_file}" == "yes" ]] && write_board_bootloader
@@ -766,10 +910,10 @@ refactor_bootfs() {
     }
 
     # Set uEnv.txt & extlinux.conf mount parameters
-    uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rw rootwait rootfstype=btrfs"
+    uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=compress=zstd:1 rw rootwait rootfstype=btrfs"
     # Set armbianEnv.txt mount parameters
     armbianenv_rootdev="UUID=${ROOTFS_UUID}"
-    armbianenv_rootflags="compress=zstd:6"
+    armbianenv_rootflags="compress=zstd:1"
 
     # Edit the uEnv.txt
     uenv_conf_file="uEnv.txt"
@@ -820,6 +964,7 @@ refactor_rootfs() {
     # Delete related files
     rm -f var/lib/dpkg/info/linux-image*
     rm -rf usr/share/doc/linux-image-*
+    rm -f usr/trim/bin/resize-rootfs.sh
 
     # Rebuild symbolic link files (ln -sf ${target} ${symbolic_link_file})
     ln -sf usr/bin bin
@@ -829,6 +974,7 @@ refactor_rootfs() {
     ln -sf /run var/run
     ln -sf /usr/share/zoneinfo/Asia/Shanghai etc/localtime
     ln -sf fnnas-ddbr usr/sbin/ddbr
+    ln -sf /usr/sbin/fnnas-tf usr/trim/bin/resize-rootfs.sh
 
     # Fix common releases permissions
     [[ -d "var/tmp" ]] && chmod 777 var/tmp
@@ -848,20 +994,25 @@ refactor_rootfs() {
     [[ -f "usr/libexec/polkit-agent-helper-1" ]] && chmod 4755 usr/libexec/polkit-agent-helper-1
 
     # Edit the etc/fstab
-    [[ -f "etc/fstab" ]] || error_msg "The etc/fstab File does not exist."
-    # Set different types of mount parameters
-    fstab_string="defaults,noatime,compress=zstd:6"
-    # Update mount settings
-    sed -i "s|^LABEL=ROOTFS.*|UUID=${ROOTFS_UUID}  /      ${rootfs_type}  ${fstab_string}  0 1|g" etc/fstab
-    [[ "${bootfs_type}" == "ext4" ]] && {
-        sed -i "s|^LABEL=BOOT.*|UUID=${BOOT_UUID}  /boot  ext4  defaults  0 2|g" etc/fstab
-    }
+    echo "# <file system> <mount point>   <type>  <options>       <dump>  <pass>" >etc/fstab
+    echo "UUID=${ROOTFS_UUID}       /      btrfs  defaults,noatime,compress=zstd:1    0 1" >>etc/fstab
+    if [[ "${bootfs_type}" == "fat32" ]]; then
+        echo "UUID=${FAT_ID_FSTAB}  /boot  vfat   defaults,noatime,errors=remount-ro  0 2" >>etc/fstab
+    else
+        echo "UUID=${BOOT_UUID}     /boot  ext4   defaults,noatime,errors=remount-ro  0 2" >>etc/fstab
+    fi
+    echo "tmpfs                     /tmp   tmpfs  defaults,nosuid  0 0" >>etc/fstab
 
     # Make the .bashrc take effect, Default shell settings file: /etc/default/useradd
     echo '[[ "${SHELL}" == *bash && -f "${HOME}/.bashrc" ]] && . ${HOME}/.bashrc' >>etc/profile
 
-    # Explicitly disable resizing for Amlogic device, use fnnas-tf settings
-    echo "yes" >root/.no_rootfs_resize
+    # Set rootfs size limit in fnnas.conf
+    [[ -f "${fnnas_conf}" ]] || error_msg "Missing fnnas configuration file: [ ${fnnas_conf} ]"
+    rootfs_expand="$(echo "${rootfs_expand}" | tr -cd '0-9.' | cut -d. -f1)"
+    [[ -z "${rootfs_expand}" || ! "${rootfs_expand}" =~ ^[0-9]+$ ]] && rootfs_expand="16"
+    [[ "${rootfs_expand}" -ne "16" ]] && {
+        sed -i "s|^rootfs_limit_gib=.*|rootfs_limit_gib=\"${rootfs_expand}\"|g" "${fnnas_conf}"
+    }
 
     # Get random macaddr
     mac_hexchars="0123456789ABCDEF"
@@ -905,7 +1056,7 @@ refactor_rootfs() {
     echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file}
     echo "KERNEL_BACKUP='yes'" >>${ophub_release_file}
     echo "BOOT_CONF='${BOOT_CONF}'" >>${ophub_release_file}
-    echo "ROOTFS_TYPE='${rootfs_type}'" >>${ophub_release_file}
+    echo "ROOTFS_TYPE='btrfs'" >>${ophub_release_file}
     echo "DISK_TYPE='usb'" >>${ophub_release_file}
     echo "AMPART_STATUS='no'" >>${ophub_release_file}
     echo "MLUBOOT_STATUS='no'" >>${ophub_release_file}
@@ -960,7 +1111,7 @@ loop_make() {
             confirm_version
 
             i="1"
-            for k in "${stable_kernel[@]}"; do
+            for k in "${build_kernel[@]}"; do
                 {
                     # Set the kernel version
                     kernel="${k}"

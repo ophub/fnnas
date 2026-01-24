@@ -32,6 +32,10 @@ inputs:
     description: "Set the rootfs size(Unit: MiB)."
     required: false
     default: ""
+  rootfs_expand:
+    description: "Set rootfs expansion size(Unit: GiB)."
+    required: false
+    default: ""
   builder_name:
     description: "Set fnnas builder signature."
     required: false
@@ -41,8 +45,8 @@ inputs:
     description: "Set fnnas debs repository."
     required: false
     default: "ophub/fnnas"
-  debs_version:
-    description: "Set fnnas debs version."
+  dtbs_version:
+    description: "Set fnnas dtbs version."
     required: false
     default: "6.12.y"
   debs_install:
@@ -123,6 +127,7 @@ runs:
             [[ -n "${{ inputs.fnnas_kernel }}" ]] && make_command="${make_command} -k ${{ inputs.fnnas_kernel }}"
             [[ -n "${{ inputs.auto_kernel }}" ]] && make_command="${make_command} -a ${{ inputs.auto_kernel }}"
             [[ -n "${{ inputs.fnnas_size }}" ]] && make_command="${make_command} -s ${{ inputs.fnnas_size }}"
+            [[ -n "${{ inputs.rootfs_expand }}" ]] && make_command="${make_command} -e ${{ inputs.rootfs_expand }}"
             [[ -n "${{ inputs.builder_name }}" ]] && make_command="${make_command} -n ${{ inputs.builder_name }}"
             read -r -a make_args <<< "${make_command}"
             sudo ./renas "${make_args[@]}"
@@ -137,7 +142,7 @@ runs:
             cd ${{ github.action_path }}
             make_command=""
             [[ -n "${{ inputs.debs_repo }}" ]] && make_command="${make_command} -r ${{ inputs.debs_repo }}"
-            [[ -n "${{ inputs.debs_version }}" ]] && make_command="${make_command} -k ${{ inputs.debs_version }}"
+            [[ -n "${{ inputs.dtbs_version }}" ]] && make_command="${make_command} -k ${{ inputs.dtbs_version }}"
             [[ -n "${{ inputs.debs_install }}" ]] && make_command="${make_command} -e ${{ inputs.debs_install }}"
             [[ -n "${{ inputs.dtbs_install }}" ]] && make_command="${make_command} -t ${{ inputs.dtbs_install }}"
             read -r -a make_args <<< "${make_command}"
