@@ -5,10 +5,10 @@
 # License version 2. This program is licensed "as is" without any
 # warranty of any kind, whether express or implied.
 #
-# This file is a part of the remake fnnas
+# This file is a part of the FnNAS project
 # https://github.com/ophub/fnnas
 #
-# Function: Create swap for fnnas system
+# Function: Create swap for FnNAS system
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/fnnas
 #
@@ -34,7 +34,7 @@ do_checkdisk() {
     # Find the partition where root is located
     ROOT_PTNAME=$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')
     if [[ -z "${ROOT_PTNAME}" ]]; then
-        error_msg "Cannot find the partition corresponding to the root file system!"
+        error_msg "Cannot find the root filesystem partition!"
     fi
 
     # Find the disk where the partition is located, supporting multi-digit partition numbers
@@ -58,7 +58,7 @@ do_checkdisk() {
         PARTITION_NAME="p"
         ;;
     *)
-        error_msg "Unable to recognize the disk type of ${ROOT_PTNAME}!"
+        error_msg "Unrecognized disk type: ${ROOT_PTNAME}!"
         ;;
     esac
 
@@ -73,32 +73,32 @@ do_checkdisk() {
     # Check if there is enough free space
     available_space="$(df -Tk ${PARTITION_PATH} | tail -n1 | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
     if [[ -z "$(echo "${available_space}" | sed -n "/^[0-9]\+$/p")" ]]; then
-        error_msg "The path is not available, the remaining space cannot be obtained."
+        error_msg "Unable to determine available space at the target path."
     fi
     if [[ "${available_space}" -lt "${swap_gb}" ]]; then
-        error_msg "The remaining space is [ ${available_space} ] GiB, and [ ${swap_gb} ] GiB swap cannot be created."
+        error_msg "Insufficient space: [ ${available_space} ] GiB available, [ ${swap_gb} ] GiB required for swap."
     fi
 
-    # Check directory
+    # Check swap directory
     SWAP_PATH="${PARTITION_PATH}/.swap"
     mkdir -p ${SWAP_PATH} && sync
-    echo -e "${INFO} Prepare to create [ ${swap_gb} ] GiB swap in the [ ${SWAP_PATH} ] directory."
+    echo -e "${INFO} Creating [ ${swap_gb} ] GiB swap in [ ${SWAP_PATH} ]."
 }
 
-# delete current swap
+# Delete current swap
 delete_current_swap() {
-    echo -e "${STEPS} Current swap size is: [ ${1} ] bytes, start to delete..."
+    echo -e "${STEPS} Current swap size: [ ${1} ] bytes. Deleting..."
     current_swap_file="$(cat /proc/swaps | sed -n '$p' | awk '{print $1}' | echo $(xargs))"
     swapoff ${current_swap_file} 2>/dev/null && sync
     rm -f ${current_swap_file} 2>/dev/null && sync
-    echo -e "${SUCCESS} Delete successfully!"
+    echo -e "${SUCCESS} Swap deleted successfully."
 }
 
-# create new swap
+# Create new swap
 create_the_swap() {
-    echo -e "${STEPS} Start creating a new swap..."
+    echo -e "${STEPS} Creating new swap file..."
     ROOTFS_TYPE="$(df -hT ${SWAP_PATH} | tail -n1 | awk '{print $2}')"
-    echo -e "${INFO} The swap size is [ ${swap_gb} ] GiB, partition types is [ ${ROOTFS_TYPE} ], Please wait..."
+    echo -e "${INFO} Swap size: [ ${swap_gb} ] GiB, partition type: [ ${ROOTFS_TYPE} ]. Please wait..."
 
     # create swapfile
     [[ "${ROOTFS_TYPE}" == "btrfs" ]] && {
@@ -121,7 +121,7 @@ create_the_swap() {
 
     sync && sleep 3
     echo -e "${INFO} Current swap: \n$(cat /proc/swaps)"
-    echo -e "${SUCCESS} Created successfully!"
+    echo -e "${SUCCESS} Swap created successfully."
 }
 
 # Check swap
@@ -149,8 +149,8 @@ do_checkswap() {
     exit 0
 }
 
-echo -e "${STEPS} Welcome to use swap management tool."
+echo -e "${STEPS} Welcome to the swap management tool."
 # Check script permission
-[[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo $0 ]"
+[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
 # Check swap
 do_checkswap "${@}"

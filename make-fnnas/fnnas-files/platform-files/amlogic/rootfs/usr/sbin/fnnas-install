@@ -8,7 +8,7 @@
 # This file is a part of the remake fnnas
 # https://github.com/ophub/fnnas
 #
-# Function: Install fnnas to eMMC for Amlogic box
+# Function: Install FnNAS to eMMC for Amlogic devices
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2022- https://github.com/7Ji/ampart
 # Copyright (C) 2021- https://github.com/ophub/fnnas
@@ -25,17 +25,17 @@
 #
 #======================================== Functions list ========================================
 #
-# error_msg           : Output error message
+# error_msg           : Output error message and abort
 # check_depends       : Check dependencies
 # init_var            : Initialize all variables
-# ampart_tool         : Repartition using ampart
-# search_aml_model    : Search the model list
-# show_aml_model      : Display the model list
-# show_partition_menu : Display disk option info
+# ampart_tool         : Repartition eMMC using ampart
+# search_aml_model    : Search the device model list
+# show_aml_model      : Display the device model list
+# show_partition_menu : Display partition options menu
 # partition_sizing    : Determine partition sizes
-# create_partition    : Create emmc partition
-# copy_bootfs         : Copy bootfs partition files
-# copy_rootfs         : Copy rootfs partition files
+# create_partition    : Create eMMC partitions
+# copy_bootfs         : Copy BOOTFS partition files
+# copy_rootfs         : Copy ROOTFS partition files
 #
 #==================================== Set default parameters ====================================
 #
@@ -46,13 +46,13 @@ use_ampart="yes"
 # Show all device list by default (-l)
 show_all_list="no"
 
-# Set install list profile
+# Device model database
 model_conf="/etc/model_database.conf"
-# Add custom fnnas firmware information
+# Custom FnNAS firmware information
 ophub_release_file="/etc/ophub-release"
-# Add fnnas configuration file
+# FnNAS configuration file
 fnnas_conf="/etc/fnnas.conf"
-# Set the installation file preprocessing directory
+# Installation preprocessing directory
 tmp_path="/ddbr"
 
 # Set font color
@@ -86,20 +86,20 @@ check_depends() {
     done
 
     if [[ "${is_missing}" -eq "1" ]]; then
-        echo -e "${INFO} Installing necessary dependencies."
+        echo -e "${INFO} Installing required dependencies."
         sudo apt-get update
         sudo apt-get install -y ${install_packages[*]}
-        [[ "${?}" -eq "0" ]] || error_msg "Failed to install dependencies, aborting!"
+        [[ "${?}" -eq "0" ]] || error_msg "Failed to install dependencies."
     else
-        echo -e "${INFO} Dependency check completed. Proceeding installation..."
+        echo -e "${INFO} All dependencies are available. Proceeding with installation."
     fi
 }
 
 # Initialize all variables
 init_var() {
-    echo -e "${STEPS} Initializing the environment..."
+    echo -e "${STEPS} Initializing environment..."
 
-    # If it is followed by [ : ], it means that the option requires a parameter value
+    # If followed by [ : ], the option requires a parameter value
     get_all_ver="$(getopt "m:a:l:" "${@}")"
 
     while [[ -n "${1}" ]]; do
@@ -140,10 +140,10 @@ init_var() {
     echo -e "${INFO} Use ampart tool: [ ${use_ampart} ]"
     echo -e "${INFO} Show all devices: [ ${show_all_list} ]"
 
-    # Find a list of devices of the same family
+    # Find devices of the same family
     SEARCH_FAMILY=""
     [[ "${show_all_list}" == "no" ]] && {
-        [[ -s "${ophub_release_file}" ]] || error_msg "[ ${ophub_release_file} ] file is missing!"
+        [[ -s "${ophub_release_file}" ]] || error_msg "Missing configuration file: [ ${ophub_release_file} ]"
         source "${ophub_release_file}" && SEARCH_FAMILY="$(basename ${FAMILY})"
         [[ -n "${SEARCH_FAMILY}" ]] && SEARCH_FAMILY=":${SEARCH_FAMILY}:"
     }
@@ -163,34 +163,34 @@ init_var() {
     [[ -n "${rootfs_resize}" ]] || rootfs_resize="yes"
     MG="${rootfs_limit_gib}GiB"
 
-    # Check if the ${model_conf} file exists
-    [[ -s "${model_conf}" ]] || error_msg "[ ${model_conf} ] file is missing!"
+    # Check if the model database file exists
+    [[ -s "${model_conf}" ]] || error_msg "Missing model database file: [ ${model_conf} ]"
     model_database="$(cat ${model_conf} | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | grep -E "^[0-9]{1,3}:.*${SEARCH_FAMILY}.*")"
     if [[ -z "${model_database}" ]]; then
         if [[ "${SEARCH_FAMILY}" == ":meson-gxbb:" ]]; then
             error_msg "The [ s905 ] series do not support writing to eMMC. Please use it via USB."
         else
-            error_msg "The [ ${SEARCH_FAMILY} ] series in the [ ${model_conf} ] file is empty and does not support write to eMMC!"
+            error_msg "The [ ${SEARCH_FAMILY} ] series in [ ${model_conf} ] is not supported for eMMC installation."
         fi
     fi
 
-    # Check if current system is booted from eMMC
+    # Check if the current system is running from eMMC
     root_devname="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')"
     if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
-        error_msg "Current system is already installed to eMMC!"
+        error_msg "System is already running from eMMC!"
     fi
 
-    # Find emmc disk, first find emmc containing boot0 partition
+    # Find eMMC disk with boot0 partition
     install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
-    # Find emmc disk, find emmc that does not contain the boot0 partition
+    # Find eMMC disk without boot0 partition
     [[ -z "${install_emmc}" ]] && install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | sort -u)"
-    # Check if emmc exists
-    [[ -z "${install_emmc}" ]] && error_msg "Internal eMMC storage was't found in this device!"
-    # Location of emmc
+    # Check if eMMC exists
+    [[ -z "${install_emmc}" ]] && error_msg "No eMMC storage found on this device!"
+    # eMMC device path
     DEV_EMMC="/dev/${install_emmc}"
-    echo -e "${INFO} Internal eMMC : [ ${DEV_EMMC} ]"
+    echo -e "${INFO} eMMC device: [ ${DEV_EMMC} ]"
 
-    # Create a file preprocessing directory
+    # Create installation preprocessing directory
     DIR_INSTALL="${tmp_path}/install"
     [[ -d "${DIR_INSTALL}" ]] && rm -rf ${DIR_INSTALL}
     mkdir -p ${DIR_INSTALL} && chmod 777 ${tmp_path}
@@ -200,13 +200,13 @@ init_var() {
     dbus-uuidgen --ensure=/etc/machine-id
     dbus-uuidgen --ensure
 
-    # Generate New BOOT_UUID
+    # Generate new BOOT_UUID
     BOOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
     [[ -z "${BOOT_UUID}" ]] && BOOT_UUID="$(uuidgen)"
     [[ -z "${BOOT_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
     FAT_ID_RAW=$(echo "${BOOT_UUID}" | tr -d '-' | cut -c1-8)
     FAT_ID_FSTAB=$(echo "${FAT_ID_RAW}" | awk '{print toupper(substr($0,1,4) "-" substr($0,5,4))}')
-    # Generate New ROOTFS UUID
+    # Generate new ROOTFS_UUID
     ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
     [[ -z "${ROOTFS_UUID}" ]] && ROOTFS_UUID="$(uuidgen)"
     [[ -z "${ROOTFS_UUID}" ]] && error_msg "The new UUID is invalid, cannot continue."
@@ -264,7 +264,7 @@ search_aml_model() {
 # 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG  8.DESCRIPTION
 # 9.KERNEL_TAGS  10.PLATFORM  11.FAMILY  12.BOOT_CONF  13.CONTRIBUTORS  14.BOARD  15.BUILD
 show_aml_model() {
-    echo -e "${STEPS} Start selecting device..."
+    echo -e "${STEPS} Selecting device..."
 
     # Define split line style
     split_line="-----------------------------------------------------------------------------------------------------"
@@ -321,13 +321,13 @@ show_aml_model() {
     echo -e "${INFO} UBOOT_OVERLOAD: [ ${UBOOT_OVERLOAD} ]"
     echo -e "${INFO} NEED_OVERLOAD: [ ${NEED_OVERLOAD} ]"
 
-    # Check dtb file
-    [[ -n "${FDTFILE}" && -f "/boot/dtb/amlogic/${FDTFILE}" ]] || error_msg "The [ ${FDTFILE} ] is missing, aborting!"
+    # Check DTB file
+    [[ -n "${FDTFILE}" && -f "/boot/dtb/amlogic/${FDTFILE}" ]] || error_msg "DTB file [ ${FDTFILE} ] not found."
     # Check UBOOT_OVERLOAD file
-    [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The [ ${UBOOT_OVERLOAD} ] is missing, aborting!"
+    [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "UBOOT_OVERLOAD file [ ${UBOOT_OVERLOAD} ] not found."
 }
 
-# Show partition menu
+# Show partition options menu
 show_partition_menu() {
     cat <<EOF
   ┌────────────────────────────────────────────────────────────────────────┐
@@ -479,41 +479,41 @@ partition_sizing() {
 
 # Nuclear re-partition function
 redo_partitions() {
-    echo -e "${INFO} Re-initializing partition table (Nuclear Option)..."
+    echo -e "${INFO} Re-initializing partition table..."
 
-    # Stop all active LVM/RAID groups
+    # Stop active LVM/RAID groups
     vgchange -an >/dev/null 2>&1
     dmsetup remove_all >/dev/null 2>&1
     mdadm --stop --scan >/dev/null 2>&1
 
-    # Unmount everything forcefully
+    # Force unmount all partitions
     for i in $(seq 1 16); do
         umount -f "${DEV_EMMC}p${i}" >/dev/null 2>&1
         umount -l "${DEV_EMMC}p${i}" >/dev/null 2>&1
     done
 
-    # Violently clear MBR (To break the kernel lock)
+    # Clear MBR to release kernel partition locks
     dd if=/dev/zero of="${DEV_EMMC}" bs=512 count=1 conv=fsync 2>/dev/null
     sync
     partprobe "${DEV_EMMC}" 2>/dev/null
     sleep 3
 
-    # Recreate all partitions
+    # Recreate partitions
     parted -s "${DEV_EMMC}" mklabel msdos
     parted -s "${DEV_EMMC}" mkpart primary fat32 $((BLANK1))MiB $((BLANK1 + BOOT - 1))MiB
     parted -s "${DEV_EMMC}" mkpart primary btrfs ${ROOTFS_START_MiB}MiB ${ROOTFS_END}
 }
 
-# Create emmc partition
+# Create eMMC partitions
 create_partition() {
     cd /
-    echo -e "${STEPS} Partitioning eMMC..."
+    echo -e "${STEPS} Creating eMMC partitions..."
 
-    # Backup the bootloader, necessary for system recovery
+    # Backup the bootloader (required for system recovery)
     [[ -d "/usr/lib/u-boot" ]] || mkdir -p /usr/lib/u-boot
     MYBOX_UBOOT="/usr/lib/u-boot/mybox-bootloader.img"
     if [[ ! -f "${MYBOX_UBOOT}" ]]; then
-        echo -e "${INFO} Start backing up the default bootloader."
+        echo -e "${INFO} Backing up the default bootloader."
         dd if="${DEV_EMMC}" of="${MYBOX_UBOOT}" bs=1M count=4 conv=fsync
         [[ "${?}" -eq "0" ]] || error_msg "Using dd to backup [ ${MYBOX_UBOOT} ] failed."
     else
@@ -527,14 +527,14 @@ create_partition() {
         fi
     fi
 
-    echo -e "${INFO} Checking and stopping active LVM/RAID groups..."
+    echo -e "${INFO} Stopping active LVM/RAID groups..."
 
-    # Stop all active LVM/RAID groups
+    # Stop active LVM/RAID groups
     vgchange -an >/dev/null 2>&1
     dmsetup remove_all >/dev/null 2>&1
     mdadm --stop --scan >/dev/null 2>&1
 
-    # Unmount all mounted partitions on the eMMC
+    # Unmount all eMMC partitions
     for i in $(seq 1 16); do
         if lsblk "${DEV_EMMC}p${i}" >/dev/null 2>&1; then
             umount -f "${DEV_EMMC}p${i}" >/dev/null 2>&1
@@ -554,8 +554,8 @@ create_partition() {
     partprobe "${DEV_EMMC}" 2>/dev/null
     sleep 3
 
-    # Clear emmc disk data (Modified to preserve Partition 3+)
-    echo -e "${INFO} Deleting only BOOT and ROOTFS partitions (p1, p2)..."
+    # Clear BOOT and ROOTFS partitions (preserve P3+)
+    echo -e "${INFO} Removing BOOT and ROOTFS partitions (p1, p2)..."
     for i in 1 2; do
         if lsblk "${DEV_EMMC}p${i}" >/dev/null 2>&1; then
             parted -s ${DEV_EMMC} rm ${i}
@@ -564,7 +564,7 @@ create_partition() {
         fi
     done
 
-    echo -e "${INFO} Start creating partitions..."
+    echo -e "${INFO} Creating partitions..."
     if ! parted -s "${DEV_EMMC}" print >/dev/null 2>&1; then
         echo -e "${INFO} No partition table found. Creating msdos label."
         parted -s "${DEV_EMMC}" mklabel msdos
@@ -582,9 +582,9 @@ create_partition() {
         P1_RECREATED="yes"
     fi
 
-    # Create Rootfs partition
+    # Create ROOTFS partition
     if [[ "${P1_RECREATED}" != "yes" ]]; then
-        echo -e "${INFO} Creating Rootfs partition..."
+        echo -e "${INFO} Creating ROOTFS partition..."
         if ! parted -s "${DEV_EMMC}" mkpart primary btrfs ${ROOTFS_START_MiB}MiB ${ROOTFS_END} 2>/dev/null; then
             echo -e "${INFO} Overlap detected. Invoking Nuclear Re-partition to apply new size..."
             redo_partitions
@@ -592,7 +592,7 @@ create_partition() {
         fi
     fi
 
-    # Inform the kernel of partition table changes
+    # Notify kernel of partition table changes
     sync
     partprobe "${DEV_EMMC}" 2>/dev/null
     sleep 3
@@ -613,8 +613,8 @@ create_partition() {
     fi
     [[ "${?}" -eq "0" ]] || error_msg "Failed to write bootloader using [ dd ]."
 
-    # Generate a random disk signature and write it to the eMMC at offset 440
-    dd if=/dev/urandom of="${DEV_EMMC}" bs=1 count=4 seek=440 conv=notrunc status=none
+    # Set the MBR Disk Signature to match FAT_ID_RAW for PARTUUID consistency
+    echo "label-id: 0x${FAT_ID_RAW}" | sfdisk "${DEV_EMMC}" >/dev/null 2>&1
     sync && sleep 3
 }
 
@@ -639,25 +639,25 @@ copy_bootfs() {
     mount -o rw ${PART_BOOT} ${DIR_INSTALL}
     [[ "${?}" -eq "0" ]] || error_msg "Failed to mount BOOTFS partition."
 
-    echo -e "${INFO} Copying BOOTFS ..."
+    echo -e "${INFO} Copying BOOTFS partition data..."
     cp -rf /boot/* ${DIR_INSTALL}
     # Remove useless files
     rm -rf ${DIR_INSTALL}/'System Volume Information'
     rm -f ${DIR_INSTALL}/s9*
     rm -f ${DIR_INSTALL}/aml*
-    # Replace eMMC boot files
+    # Replace eMMC boot script files
     [[ -f "${DIR_INSTALL}/boot-emmc.scr" ]] && mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
     [[ -f "${DIR_INSTALL}/boot-emmc.cmd" ]] && mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
     [[ -f "${DIR_INSTALL}/boot-emmc.ini" ]] && mv -f ${DIR_INSTALL}/boot-emmc.ini ${DIR_INSTALL}/boot.ini
     [[ -f "${DIR_INSTALL}/boot.ini" ]] && sed -i "s|u-boot.ext|u-boot.emmc|g" ${DIR_INSTALL}/boot.ini
 
-    # Set new rootfs mount string
+    # Set rootfs mount string for boot config
     uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=compress=zstd:1 rootfstype=btrfs"
 
     # Update [ /boot/uEnv.txt ] settings
     uenv_conf_file="${DIR_INSTALL}/uEnv.txt"
     [[ -f "${uenv_conf_file}" ]] && {
-        echo -e "${INFO} Update the [ uEnv.txt ] file."
+        echo -e "${INFO} Updating [ uEnv.txt ] file."
         BOOT_CONF="uEnv.conf"
         sed -i "s|root=.*console=ttyAML0|root=${uenv_mount_string} console=ttyAML0|g" ${uenv_conf_file}
         sed -i "s|meson.*.dtb|${FDTFILE}|g" ${uenv_conf_file}
@@ -666,16 +666,24 @@ copy_bootfs() {
     # Update [ /boot/extlinux/extlinux.conf ] settings
     boot_extlinux_file="${DIR_INSTALL}/extlinux/extlinux.conf"
     [[ -f "${boot_extlinux_file}" ]] && {
-        echo -e "${INFO} Update the [ extlinux.conf ] file."
+        echo -e "${INFO} Updating [ extlinux.conf ] file."
         BOOT_CONF="extlinux.conf"
         sed -i "s|root=.*console=ttyAML0|root=${uenv_mount_string} console=ttyAML0|g" ${boot_extlinux_file}
         sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
     }
 
+    # Edit the fnEnv.txt
+    fnenv_conf_file="${DIR_INSTALL}/fnEnv.txt"
+    [[ -f "${fnenv_conf_file}" ]] && {
+        sed -i "s|\(fdtfile=.*\/\)[^/]*$|\1${FDTFILE}|g" ${fnenv_conf_file}
+        sed -i "s|^instdisk_bootuuid=.*|instdisk_bootuuid=${FAT_ID_RAW}-01|g" ${fnenv_conf_file}
+        sed -i "s|^instdisk_rootuuid=.*|instdisk_rootuuid=${FAT_ID_RAW}-02|g" ${fnenv_conf_file}
+    }
+
     # Copy u-boot.ext and u-boot.emmc
     if { [[ "${NEED_OVERLOAD}" == "yes" || "${auto_mainline_uboot}" == "yes" ]]; } &&
         { [[ -n "${UBOOT_OVERLOAD}" && -f "${DIR_INSTALL}/${UBOOT_OVERLOAD}" ]]; }; then
-        echo -e "${INFO} Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
+        echo -e "${INFO} Copying [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
         if [[ -f "${DIR_INSTALL}/u-boot.ext" ]]; then
             cp -f ${DIR_INSTALL}/u-boot.ext ${DIR_INSTALL}/u-boot.emmc
         else
@@ -694,7 +702,7 @@ copy_bootfs() {
 # Copy rootfs partition files
 copy_rootfs() {
     cd /
-    echo -e "${STEPS} Start processing the rootfs partition..."
+    echo -e "${STEPS} Processing ROOTFS partition..."
 
     PART_ROOT="${DEV_EMMC}p2"
 
@@ -704,14 +712,14 @@ copy_rootfs() {
         [[ "${?}" -eq "0" ]] || error_msg "Failed to umount [ ${PART_ROOT} ]."
     fi
 
-    echo -e "${INFO} Formatting ROOTFS ..."
+    echo -e "${INFO} Formatting ROOTFS partition..."
     mkfs.btrfs -f -U ${ROOTFS_UUID} -L "ROOTFS_EMMC" -m single ${PART_ROOT}
     [[ "${?}" -eq "0" ]] || error_msg "Failed to format ROOTFS with [ mkfs.btrfs ]"
 
     mount -t btrfs -o compress=zstd:1 ${PART_ROOT} ${DIR_INSTALL}
     [[ "${?}" -eq "0" ]] || error_msg "Failed to mount ROOTFS."
 
-    echo -e "${INFO} Copying ROOTFS ..."
+    echo -e "${INFO} Copying ROOTFS partition data..."
     # Create relevant directories
     mkdir -p ${DIR_INSTALL}/{boot/,dev/,media/,mnt/,proc/,run/,sys/,tmp/}
     chmod 1777 ${DIR_INSTALL}/tmp
@@ -731,7 +739,7 @@ copy_rootfs() {
     ln -sf usr/lib ${DIR_INSTALL}/lib
     ln -sf usr/sbin ${DIR_INSTALL}/sbin
 
-    echo -e "${INFO} Generate the new fstab file."
+    echo -e "${INFO} Generating fstab file."
     rm -f ${DIR_INSTALL}/etc/fstab
     cat >${DIR_INSTALL}/etc/fstab <<EOF
 # <file system>   <mount point>   <type>   <options>   <dump>   <pass>
@@ -741,7 +749,7 @@ tmpfs                     /tmp    tmpfs   defaults,nosuid                       
 
 EOF
 
-    echo -e "${INFO} Update parameters related to the releases file."
+    echo -e "${INFO} Updating release file parameters."
     ophub_config_file="${DIR_INSTALL}${ophub_release_file}"
     sed -i "s|^MODEL_ID=.*|MODEL_ID='${boxid}'|g" ${ophub_config_file}
     sed -i "s|^MODEL_NAME=.*|MODEL_NAME='${MODEL_NAME}'|g" ${ophub_config_file}
@@ -756,8 +764,8 @@ EOF
     sed -i "s|^MLUBOOT_STATUS=.*|MLUBOOT_STATUS='${auto_mainline_uboot}'|g" ${ophub_config_file}
     sed -i "s|^AMPART_STATUS=.*|AMPART_STATUS='${AMPART_STATUS}'|g" ${ophub_config_file}
 
-    # Update fnnas.conf to disable rootfs resize on first boot
-    echo -e "${INFO} Update parameters related to the fnnas configuration file."
+    # Disable rootfs auto-resize on first boot
+    echo -e "${INFO} Updating FnNAS configuration file."
     fnnas_conf_file="${DIR_INSTALL}${fnnas_conf}"
     sed -i "s|^rootfs_resize=.*|rootfs_resize=\"no\"|g" "${fnnas_conf_file}"
 
@@ -768,7 +776,7 @@ EOF
 
 # Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
-echo -e "${STEPS} Installing fnnas to internal eMMC..."
+echo -e "${STEPS} Installing FnNAS to eMMC..."
 
 # Check dependencies
 check_depends
@@ -785,5 +793,5 @@ copy_bootfs
 # Copy rootfs partition files
 copy_rootfs
 
-echo -e "${SUCCESS} Installation successful. Run [ poweroff ], remove the installation media then re-insert the power supply to boot new system."
+echo -e "${SUCCESS} Installation successful. Run [ poweroff ], remove the installation media, then re-insert the power supply to boot FnNAS."
 exit 0

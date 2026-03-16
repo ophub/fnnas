@@ -1,0 +1,7 @@
+verbosity=1
+bootlogo=false
+console=both
+fdtfile=amlogic/meson-gxl-s905d-phicomm-n1.dtb
+kernelfile=vmlinuz-6.12.41-trim
+instdisk_bootuuid=55d3056b-01
+instdisk_rootuuid=55d3056b-02

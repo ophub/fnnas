@@ -5,10 +5,10 @@
 # License version 2. This program is licensed "as is" without any
 # warranty of any kind, whether express or implied.
 #
-# This file is a part of the remake fnnas
+# This file is a part of the FnNAS project
 # https://github.com/ophub/fnnas
 #
-# Function: Partition Expansion Tool
+# Function: Partition expansion tool
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/fnnas
 #
@@ -16,7 +16,7 @@
 #
 #========================= Set default parameters ==========================
 #
-# Load configuration file
+# Load FnNAS configuration file
 fnnas_conf="/etc/fnnas.conf"
 
 # Set font color
@@ -98,11 +98,11 @@ do_checkdisk() {
 
 # Expand the current partition
 expansion_partition() {
-    echo -e "${INFO} Start repairing hard disk size..."
+    echo -e "${INFO} Expanding root partition..."
 
     # Try to fix GPT backup header location
     printf 'f\n' | parted ---pretend-input-tty /dev/${DISK_NAME} unit s print >/dev/null 2>&1
-    [[ "${?}" -eq "0" ]] && echo -e "${INFO} GPT Header check complete."
+    [[ "${?}" -eq "0" ]] && echo -e "${INFO} GPT header check completed."
 
     # Check partition count
     pt_num="$(parted -s /dev/${DISK_NAME} print 2>/dev/null | awk '$1~/[1-9]+/ {print $1}' | wc -l)"
@@ -128,7 +128,7 @@ expansion_partition() {
     partprobe /dev/${DISK_NAME} 2>/dev/null
     sync && sleep 3
 
-    echo -e "${INFO} Expansion file system..."
+    echo -e "${INFO} Expanding filesystem..."
     ROOTFS_TYPE="$(df -T / | tail -n1 | awk '{print $2}')"
 
     if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
@@ -139,18 +139,18 @@ expansion_partition() {
         [[ "${?}" -ne "0" ]] && error_msg "[ resize2fs ] operation failed."
     fi
 
-    echo -e "${SUCCESS} The current partition expansion is successful."
+    echo -e "${SUCCESS} Partition expanded successfully."
 }
 
 # Show welcome message
-echo -e "${STEPS} Welcome to Partition Expansion Tool."
+echo -e "${STEPS} Welcome to the partition expansion tool."
 # Check for root privileges
 [[ "$(id -u)" -ne "0" ]] && error_msg "This script must be run as root!"
 # Initialize variables
 init_var
 # Check if root filesystem auto-resize is disabled
 [[ "${rootfs_resize}" == "yes" ]] || {
-    echo -e "${INFO} Root filesystem auto-resize is disabled in configuration. Exiting."
+    echo -e "${INFO} Root filesystem auto-resize is disabled. Exiting."
     exit 0
 }
 # Check disk and partition info

@@ -12,12 +12,12 @@ on:
       fnnas_base_version:
         description: "Select fnnas base image version"
         required: false
-        default: "amlogic_580"
+        default: "amlogic_693"
         type: choice
         options:
-          - allwinner_619
-          - amlogic_580
-          - rockchip_641
+          - allwinner_691
+          - amlogic_693
+          - rockchip_692
       fnnas_board:
         description: "Select fnnas device board"
         required: false
@@ -42,6 +42,7 @@ on:
           - bdkj-bd-one
           - bdy-g18-pro
           - beikeyun
+          - cd1000
           - chainedbox
           - cm3588-nas
           - crrc
@@ -58,6 +59,7 @@ on:
           - firefly-rk3399
           - fmx1-pro
           - fmx1-pro-b
+          - gea-6319
           - gzpeite-p01
           - h28k
           - h66k
@@ -66,7 +68,9 @@ on:
           - h88k
           - h88k-v3
           - h96-max-m2
+          - hk1-rbox-k8s
           - hs530r
+          - ht2
           - hugsun-x99
           - ipc-r
           - jp-tvbox
@@ -75,7 +79,9 @@ on:
           - lckfb-tspi
           - leez
           - lx-r3s
+          - lyt-t68m
           - lz-d3568
+          - lz-d3588
           - lz-k3568
           - mrkaio-m68s
           - nanopc-t4
@@ -191,6 +197,7 @@ on:
           - station-m2
           - station-p2
           - sv-33a6x
+          - sv-33a6x-vpu
           - swan1-w28
           - sw799
           - taram
@@ -260,7 +267,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Initialization environment
+      - name: Initialize the build environment
         id: init
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -286,7 +293,7 @@ jobs:
           timedatectl status || true
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Create simulated physical disk
+      - name: Create virtual disk for extended storage
         run: |
           mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
           root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
@@ -355,7 +362,7 @@ jobs:
                       echo "status=success" >> ${GITHUB_OUTPUT}
                       exit 0
                   else
-                      echo "gh download failed."
+                      echo "Error: gh download failed."
                       exit 1
                   fi
               else
@@ -384,8 +391,7 @@ jobs:
                   {data: .updated_at, url: .url, name: .name}')
 
               [[ -z "${latest_version}" || "${latest_version}" == "null" ]] && {
-                  echo "Invalid fnnas image file download address."
-                  exit 1
+              echo "Error: Failed to resolve FnNAS image download URL."
               }
 
               latest_url="$(echo ${latest_version} | jq -r '.url')"
@@ -404,16 +410,16 @@ jobs:
                "${latest_url}" \
                -o "fnnas/${fnnas_filename}"
 
-          [[ "${?}" -ne "0" ]] && echo "Download failed." && exit 1
+          [[ "${?}" -ne "0" ]] && echo "Error: Download failed." && exit 1
 
-          # Add directory links
+          # Create directory symlinks for packaging
           ln -sf /builder/fnnas ${{ github.workspace }}/fnnas
           ln -sf /builder/fnnas /home/runner/work/_actions/ophub/fnnas/main/fnnas
 
           echo "build_tag=${build_tag}" >> ${GITHUB_ENV}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Packaging fnnas
+      - name: Package FnNAS for target boards
         if: ${{ steps.down.outputs.status == 'success' && !cancelled() }}
         uses: ophub/fnnas@main
         with:
@@ -425,7 +431,7 @@ jobs:
           rootfs_expand: ${{ inputs.rootfs_expand }}
           builder_name: ${{ inputs.builder_name }}
 
-      - name: Upload the packaged fnnas
+      - name: Upload packaged FnNAS to Release
         uses: ncipollo/release-action@main
         if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() }}
         with:

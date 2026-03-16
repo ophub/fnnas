@@ -13,12 +13,12 @@ on:
       fnnas_base_version:
         description: "Select fnnas base image version"
         required: false
-        default: "amlogic_580"
+        default: "amlogic_693"
         type: choice
         options:
-          - allwinner_619
-          - amlogic_580
-          - rockchip_641
+          - allwinner_691
+          - amlogic_693
+          - rockchip_692
       debs_repo:
         description: "Set fnnas debs repository"
         required: false
@@ -58,7 +58,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Initialization environment
+      - name: Initialize the build environment
         id: init
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -84,7 +84,7 @@ jobs:
           timedatectl status || true
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Create simulated physical disk
+      - name: Create virtual disk for extended storage
         id: disk
         run: |
           mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
@@ -111,7 +111,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Starting to download the latest fnnas base image..."
+          echo "Starting to download the latest FnNAS base image..."
           fnnas_base_version="${{ inputs.fnnas_base_version }}"
           [[ -d "fnnas" ]] || mkdir -p fnnas
 
@@ -129,7 +129,7 @@ jobs:
               {data: .updated_at, url: .url, name: .name}')
 
           [[ -z "${latest_version}" || "${latest_version}" == "null" ]] && {
-              echo "Invalid fnnas image file download address."
+              echo "Error: Failed to resolve FnNAS image download URL."
               exit 1
           }
 
@@ -144,14 +144,14 @@ jobs:
               "${latest_url}" \
               -o "fnnas/${fnnas_filename}"
 
-          [[ "${?}" -ne "0" ]] && echo "Download failed." && exit 1
+          [[ "${?}" -ne "0" ]] && echo "Error: Download failed." && exit 1
 
           ln -sf /builder/fnnas ${{ github.workspace }}/fnnas
           ln -sf /builder/fnnas /home/runner/work/_actions/ophub/fnnas/main/fnnas
 
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Compile the fnnas kernel
+      - name: Compile the FnNAS kernel
         uses: ophub/fnnas@main
         if: ${{ steps.down.outputs.status == 'success' && !cancelled() }}
         with:

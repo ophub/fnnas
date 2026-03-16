@@ -20,17 +20,17 @@
 #
 #============================= Functions list =============================
 #
-# do_start          : Turn on the led screen display
-# do_stop           : Turn off the led screen display
-# do_update_conf    : Update openvfd config files
-# do_select_box     : Call config based on options
+# do_start          : Turn on the LED screen display
+# do_stop           : Turn off the LED screen display
+# do_update_conf    : Update OpenVFD config files
+# do_select_box     : Select and apply config by device ID
 #
 #==========================================================================
 #
-# Openvfd files storage path
+# OpenVFD files storage path
 openvfd_path="/usr/share/openvfd"
 openvfd_service="${openvfd_path}/vfdservice"
-# The openvfd files download repository
+# OpenVFD files download repository
 openvfd_repo="https://github.com/ophub/amlogic-s9xxx-armbian.git"
 openvfd_dir="build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd"
 #
@@ -51,7 +51,7 @@ error_msg() {
 
 # Update openvfd config files
 do_update_conf() {
-    echo -e "${STEPS} Start updating the openfvd config files..."
+    echo -e "${STEPS} Updating OpenVFD config files..."
 
     # Check dependencies
     [[ -z "$(dpkg -l | awk '{print $2}' | grep -w "^git$")" ]] && sudo apt-get update && sudo apt-get install -y git
@@ -64,25 +64,25 @@ do_update_conf() {
     echo "${openvfd_dir}/*" >>.git/info/sparse-checkout
     git remote add origin ${openvfd_repo}
     git pull --quiet --depth=1 origin main
-    [[ "${?}" -ne "0" ]] && error_msg "Download [ ${openvfd_repo} ] scripts failed."
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to download [ ${openvfd_repo} ] scripts."
 
     # Update related files
     mkdir -p ${openvfd_path}
     cp -af --no-preserve=ownership ${git_tmp_path}/${openvfd_dir}/* ${openvfd_path}
-    [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${openvfd_repo} ] scripts failed."
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to sync [ ${openvfd_repo} ] scripts."
     chmod +x ${openvfd_path}/vfdservice
 
     # Clean up temporary files
     rm -rf ${git_tmp_path} 2>/dev/null
 
     sync && sleep 3
-    echo -e "${SUCCESS} Openfvd config files update completed."
+    echo -e "${SUCCESS} OpenVFD config files updated successfully."
     exit 0
 }
 
-# Turn on the led screen display
+# Turn on the LED screen display
 do_start() {
-    echo -e "${STEPS} Start the led screen display..."
+    echo -e "${STEPS} Starting LED screen display..."
 
     # Check config files and services
     conf_file="${openvfd_path}/conf/${1}"
@@ -115,22 +115,22 @@ do_start() {
         done
     fi
 
-    echo -e "${SUCCESS} Enable LED display!"
+    echo -e "${SUCCESS} LED display enabled!"
     exit 0
 }
 
-# Turn off the led screen display
+# Turn off the LED screen display
 do_stop() {
-    echo -e "${STEPS} Start to turn off the led screen display..."
+    echo -e "${STEPS} Turning off LED screen display..."
 
     killall -9 vfdservice 2>/dev/null
     rmmod openvfd -f 2>/dev/null
 
-    echo -e "${SUCCESS} Disable LED display!"
+    echo -e "${SUCCESS} LED display disabled!"
     exit 0
 }
 
-# Call config based on options
+# Select and apply config by device ID
 do_select_box() {
     case "${1}" in
     11 | x96max) do_start x96max.conf ;;
@@ -150,7 +150,7 @@ do_select_box() {
     99 | diy) do_start diy.conf ;;
     0 | stop) do_stop ;;
     1 | quit) echo "quit!" && exit 0 ;;
-    *) error_msg "Invalid input!" ;;
+    *) error_msg "Invalid input ID!" ;;
     esac
 }
 
