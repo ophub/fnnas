@@ -42,6 +42,7 @@ on:
           - bdkj-bd-one
           - bdy-g18-pro
           - beikeyun
+          - boca-tcn100
           - cd1000
           - chainedbox
           - cm3588-nas
@@ -318,6 +319,7 @@ jobs:
         if: (!cancelled())
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
         run: |
           # Create directory
           [[ -d "fnnas" ]] || mkdir -p fnnas
@@ -414,7 +416,7 @@ jobs:
 
           # Create directory symlinks for packaging
           ln -sf /builder/fnnas ${{ github.workspace }}/fnnas
-          ln -sf /builder/fnnas /home/runner/work/_actions/ophub/fnnas/main/fnnas
+          ln -sf /builder/fnnas "/home/runner/work/_actions/${OWNER,,}/fnnas/main/fnnas"
 
           echo "build_tag=${build_tag}" >> ${GITHUB_ENV}
           echo "status=success" >> ${GITHUB_OUTPUT}
