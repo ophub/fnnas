@@ -1,0 +1,113 @@
+#AP6255_NVRAM_V1.1.6_05172017.txt
+# Cloned from bcm94345wlpagb_p2xx.txt 
+NVRAMRev=$Rev: 498373 $
+sromrev=11
+vendid=0x14e4
+devid=0x43ab
+manfid=0x2d0
+prodid=0x06e4
+macaddr=00:90:4c:c5:12:38
+nocrc=1
+boardtype=0x6e4
+boardrev=0x1304
+
+#XTAL 37.4MHz
+xtalfreq=37400
+btc_mode=1
+
+#-----------------------------------------
+#boardflags: 5GHz eTR switch by default
+#            2.4GHz eTR switch by default
+#            bit1 for btcoex
+boardflags=0x00480201
+boardflags2=0x40800000
+boardflags3=0x48200100
+phycal_tempdelta=15
+rxchain=1
+txchain=1
+aa2g=1
+aa5g=1
+tssipos5g=1
+tssipos2g=1
+femctrl=0
+AvVmid_c0=1,165,2,100,2,100,2,100,2,100
+pa2ga0=-195,5558,-672
+pa2ga1=-118,4850,-635
+pa5ga0=-203,5495,-683,-205,5489,-682,-207,5494,-678,-208,5549,-683
+pa5ga1=-142,4930,-655,-150,4859,-646,-156,4887,-644,-158,4864,-641
+
+
+
+itrsw=1
+pdoffset2g40ma0=10
+pdoffset40ma0=0xaaaa
+pdoffset80ma0=0xaaaa
+extpagain5g=2
+extpagain2g=2
+tworangetssi2g=0
+tworangetssi5g=0
+# LTECX flags
+# WCI2
+ltecxmux=0
+ltecxpadnum=0x0504
+ltecxfnsel=0x22
+ltecxgcigpio=0x32
+
+maxp2ga0=70
+cckbw202gpo=0x2200
+cckbw20ul2gpo=0x2200
+ofdmlrbw202gpo=0x0000
+dot11agofdmhrbw202gpo=0x2222
+
+
+
+mcsbw202gpo=0x98444422
+mcsbw402gpo=0x98777755
+maxp5ga0=72,72,72,72
+#5GHz_20MHz Offset
+mcsbw205glpo=0xb9855222
+mcsbw205gmpo=0xb9855222
+mcsbw205ghpo=0xb9855222
+#5GHz_40MHz Offset
+mcsbw405glpo=0xb9955333
+mcsbw405gmpo=0xb9955333
+mcsbw405ghpo=0xb9955333
+#5GHz_80MHz Offset
+mcsbw805glpo=0xd9222222
+mcsbw805gmpo=0xd9222222
+mcsbw805ghpo=0xd9222222
+
+
+
+
+
+
+
+swctrlmap_2g=0x00000000,0x00000000,0x00000000,0x010000,0x3ff
+swctrlmap_5g=0x00100010,0x00200020,0x00200020,0x010000,0x3fe
+swctrlmapext_5g=0x00000000,0x00000000,0x00000000,0x000000,0x3
+swctrlmapext_2g=0x00000000,0x00000000,0x00000000,0x000000,0x3
+
+vcodivmode=1
+deadman_to=481500000
+#ed_thresh2g=-54
+#ed_thresh5g=-54
+#eu_edthresh2g=-54
+#eu_edthresh5g=-54
+ed_thresh2g=-69
+ed_thresh5g=-69
+eu_edthresh2g=-69
+eu_edthresh5g=-69
+ldo1=4
+rawtempsense=0x1ff
+cckPwrIdxCorr=3
+cckTssiDelay=150
+ofdmTssiDelay=150
+txpwr2gAdcScale=1
+txpwr5gAdcScale=1
+dot11b_opts=0x3aa85
+cbfilttype=0
+#fdsslevel_ch1=6
+#fdsslevel_ch11=4
+
+muxenab=0x10
