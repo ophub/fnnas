@@ -1,5 +1,463 @@
-#=====================================================================================# https://github.com/ophub/fnnas# Description: Build FnNAS Image#=====================================================================================name: Build FnNAS Imageon:  repository_dispatch:  workflow_dispatch:    inputs:      fnnas_base_version:        description: "Select fnnas base image version"        required: false        default: "amlogic_693"        type: choice        options:          - allwinner_691          - amlogic_693          - rockchip_692      fnnas_board:        description: "Select fnnas device board"        required: false        default: "all"        type: string
-        options:          - all          - amlogic          - rockchip          - allwinner          - rockchip50          - rockchip50_100          - first50          - range50_100          - range100_150          - last20          - a311d-oes_s922x-oes-plus_wxy-oect          - nsy-g16-plus_nsy-g68-plus_bdy-g18-pro          - s905d_s905x3_s912_s922x-ct2000          - a311d          - a311d-oes          - alark35-3500          - anas3035          - aio-3399b          - aio-3399c          - aio-3399c-ai          - bdkj-bd-one          - bdy-g18-pro          - beikeyun          - boca-tcn100          - cd1000          - chainedbox          - cm3588-nas          - crrc          - dc-a588          - dg3399          - dg-tn3568          - dlfr100          - e20c          - e25          - eaidk-610          - emb3531          - fine3399          - firefly-itx-3588j          - firefly-jd4          - firefly-rk3399          - fmx1-pro          - fmx1-pro-b          - gea-6319          - gzpeite-p01          - h28k          - h618-devboard          - h66k          - h68k          - h69k          - h88k          - h88k-v3          - h96-max-m2          - hk1-rbox-k8s          - hs530r          - ht2          - hugsun-x99          - ipc-r          - jp-tvbox          - king3399          - kylin3399          - lckfb-tspi          - leez          - lx-r3s          - lyt-t68m          - lz-d3568          - lz-d3588          - lz-k3568          - mrkaio-m68s          - nanopc-t4          - nanopc-t6          - nanopi-m5          - nanopi-r5c          - nanopi-r5s          - nsy-g16-plus          - nsy-g68-plus          - orangepi-3b          - orangepi-5-plus          - orangepi-5b          - orangepi-zero3          - panther-x2          - photonicat          - r66s          - r68s          - renegade-rk3328          - rk3318-box          - rock-5-itx          - rock5b          - rock5c          - ruisen-box          - s905          - s905-beelink-mini          - s905-mxqpro-plus          - s905d          - s905d-ki-pro          - s905d-sml5442tw          - s905l          - s905l-aurora-1s          - s905l-b860av21u          - s905l-mg101          - s905l2          - s905l2-e900v21e          - s905l2-wojia          - s905l3          - s905l3-cm211          - s905l3-unt400g1          - s905l3-unt402a          - s905l3a          - s905l3a-cm311          - s905l3a-m401a          - s905l3b          - s905l3b-e900v21d          - s905l3b-e900v22d          - s905l3b-e900v22e          - s905l3b-ip103h          - s905l3b-rg020et-ca          - s905l3b-unt403a          - s905lb-ipbs9505          - s905lb-q96-mini          - s905lb-r3300l          - s905mb          - s905w          - s905w-w95          - s905w-x96-mini          - s905w-x96w          - s905x          - s905x-b860h          - s905x-nexbox-a95x          - s905x-t95          - s905x-tbee          - s905x-tx9          - s905x2          - s905x2-km3          - s905x2-x96max-2g          - s905x2-hg680fj          - s905x3          - s905x3-2101          - s905x3-a100          - s905x3-a95xf3          - s905x3-a95xf3-gb          - s905x3-b          - s905x3-h96max          - s905x3-hk1          - s905x3-ip1001m          - s905x3-q1          - s905x3-q2          - s905x3-tox1          - s905x3-tx3          - s905x3-tx3-bz          - s905x3-ugoosx3          - s905x3-whale          - s905x3-x88-pro-x3          - s905x3-x96air          - s905x3-x96air-gb          - s905x3-x96max          - s912          - s912-h96pro-plus          - s912-m8s-pro          - s912-nexbox-a1          - s912-nexbox-a2          - s912-onecloudpro          - s912-phicomm-t1          - s912-t95z-plus          - s912-tx8-max          - s912-tx9-pro-2g          - s912-tx9-pro-3g          - s912-x92          - s912-zyxq-fake          - s922x          - s922x-ct2000          - s922x-gtking          - s922x-gtkingpro-h          - s922x-odroid-n2          - s922x-oes-plus          - s922x-reva          - s922x-ugoos-am6          - seewo-sv21          - smart-am40          - smart-am60          - station-m1          - station-m2          - station-p2          - sv-33a6x          - sv-33a6x-vpu          - swan1-w28          - sw799          - taram          - tanix-tx6          - tb-ls3399          - tn3399          - tpm312          - tqc-a01          - tvi3315a          - vplus          - wocyber-a3          - wxy-oect          - wxy-oect-mod          - x88pro20          - x98h          - xiaobao          - yskj          - zcube1-max          - zk-r39a          - zysj      kernel_repo:        description: "Set fnnas kernel repository"        required: false        default: "ophub/fnnas"        type: string
-        options:          - ophub/fnnas      fnnas_kernel:        description: "Select fnnas kernel version"        required: false        default: "6.12.y"        type: string
-        options:          - 6.12.y          - 6.18.y          - 6.12.y_6.18.y      auto_kernel:        description: "Auto use the latest kernel"        required: false        default: true        type: boolean      rootfs_expand:        description: "Set rootfs expansion size(GiB)"        required: false        default: "16"      fnnas_url:        description: "Custom fnnas image download url"        required: false        default: ""      builder_name:        description: "Set fnnas builder signature"        required: false        default: "ophub"        type: string
-        options:          - ophub          - angel          - yournameenv:  TZ: Etc/UTCjobs:  build:    runs-on: ubuntu-24.04    if: ${{ github.event.repository.owner.id == github.event.sender.id }}    steps:      - name: Checkout        uses: actions/checkout@v6      - name: Initialize the build environment        id: init        env:          DEBIAN_FRONTEND: noninteractive        run: |          docker rmi -f $(docker images -q) 2>/dev/null || true          [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"          sudo rm -rf /usr/share/dotnet /usr/local/lib/android 2>/dev/null          sudo swapoff -a          sudo rm -f /swapfile /mnt/swapfile          sudo -E apt-get -y update          sudo -E apt-get -y purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true          sudo -E apt-get -y install $(curl -fsSL https://ophub.org/ubuntu2404-make-fnnas-depends)          sudo -E systemctl daemon-reload          #sudo -E apt-get -y full-upgrade          sudo -E apt-get -y autoremove --purge          sudo -E apt-get clean          sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}          sudo rm -rf ~/{.cargo,.dotnet,.rustup}          sudo -E timedatectl set-timezone "${TZ:-Etc/UTC}"          sudo -E ntpdate ntp.ubuntu.com 0.pool.ntp.org || true          sudo -E timedatectl set-ntp true          date -u          timedatectl status || true          echo "status=success" >> ${GITHUB_OUTPUT}      - name: Create virtual disk for extended storage        run: |          mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)          root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)          sudo truncate -s "${mnt_size}"G /mnt/mnt.img          sudo truncate -s "${root_size}"G /root.img          sudo losetup /dev/loop6 /mnt/mnt.img          sudo losetup /dev/loop7 /root.img          sudo pvcreate /dev/loop6          sudo pvcreate /dev/loop7          sudo vgcreate github /dev/loop6 /dev/loop7          sudo lvcreate -n runner -l 100%FREE github          sudo mkfs.xfs -f -i sparse=0 -b size=4096 /dev/github/runner          sudo mkdir -p /builder          sudo mount /dev/github/runner /builder          sudo chown -R runner:runner /builder          df -Th          echo "status=success" >> ${GITHUB_OUTPUT}      - name: Download fnnas image [ ${{ inputs.fnnas_base_version }} ]        id: down        working-directory: /builder        if: (!cancelled())        env:          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          OWNER: ${{ github.repository_owner }}        run: |          # Create directory          [[ -d "fnnas" ]] || mkdir -p fnnas          input_url="${{ inputs.fnnas_url }}"          fnnas_base_version="${{ inputs.fnnas_base_version }}"          [[ -n "${fnnas_base_version}" ]] && build_tag="fnnas_${fnnas_base_version}" || build_tag="fnnas_save"          # -------------------------------------------------------          # Case A: URL specified          # -------------------------------------------------------          if [[ -n "${input_url}" ]]; then              echo "Custom URL detected: ${input_url}"              # Remove any parameters that may be included in the URL (?...)              clean_url="${input_url%%\?*}"              # Regex match GitHub Release URL format              # Format: https://github.com/<owner>/<repo>/releases/download/<tag>/<filename>              regex="github\.com/([^/]+)/([^/]+)/releases/download/([^/]+)/(.+)"              if [[ "${clean_url}" =~ $regex ]]; then                  # Extract information                  owner="${BASH_REMATCH[1]}"                  repo="${BASH_REMATCH[2]}"                  tag="${BASH_REMATCH[3]}"                  filename="${BASH_REMATCH[4]}"                  echo "Detected GitHub Release URL."                  echo "Repo: $owner/$repo | Tag: $tag | File: $filename"                  # Use gh cli to download                  gh release download "${tag}" \                      --repo "${owner}/${repo}" \                      --pattern "${filename}" \                      --dir "fnnas" \                      --clobber                  # Check download result                  if [[ -f "fnnas/${filename}" ]]; then                      echo "Download success via gh-cli."                      echo "status=success" >> ${GITHUB_OUTPUT}                      exit 0                  else                      echo "Error: gh download failed."                      exit 1                  fi              else                  # If not a standard Release URL (e.g., API URL or third-party URL), fallback to curl                  echo "Using curl fallback..."                  latest_url="${input_url}"                  fnnas_filename=$(basename "${clean_url}")              fi          # -------------------------------------------------------          # Case B: Automatically fetch the latest version          # -------------------------------------------------------          else              echo "Auto-detecting latest release..."              latest_version=$(curl -s \                  -H "Accept: application/vnd.github+json" \                  -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \                  https://api.github.com/repos/ophub/fnnas/releases?per_page=20 | \                  jq -r --arg RTK "fnnas_base_image" \                  --arg BOARD "${fnnas_base_version}" \                  '[.[] | select(.tag_name | contains($RTK))] |                  map(.assets[] | select(.name | contains($BOARD) and endswith(".img.xz"))) |                  sort_by(.updated_at) |                  reverse |                  .[0] |                  {data: .updated_at, url: .url, name: .name}')              [[ -z "${latest_version}" || "${latest_version}" == "null" ]] && {              echo "Error: Failed to resolve FnNAS image download URL."              }              latest_url="$(echo ${latest_version} | jq -r '.url')"              fnnas_filename="$(echo ${latest_version} | jq -r '.name')"          fi          # -------------------------------------------------------          # Execute curl download (only if the above gh did not run)          # -------------------------------------------------------          echo "Downloading: ${fnnas_filename}"          echo "Source: ${latest_url}"          curl -fsSL \               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \               -H "Accept: application/octet-stream" \               "${latest_url}" \               -o "fnnas/${fnnas_filename}"          [[ "${?}" -ne "0" ]] && echo "Error: Download failed." && exit 1          # Create directory symlinks for packaging          ln -sf /builder/fnnas ${{ github.workspace }}/fnnas          ln -sf /builder/fnnas "/home/runner/work/_actions/${OWNER,,}/fnnas/main/fnnas"          echo "build_tag=${build_tag}" >> ${GITHUB_ENV}          echo "status=success" >> ${GITHUB_OUTPUT}      - name: Package FnNAS for target boards        if: ${{ steps.down.outputs.status == 'success' && !cancelled() }}        uses: ophub/fnnas@main        with:          fnnas_path: fnnas/*.img.xz          fnnas_board: ${{ inputs.fnnas_board }}          fnnas_kernel: ${{ inputs.fnnas_kernel }}          auto_kernel: ${{ inputs.auto_kernel }}          kernel_repo: ${{ inputs.kernel_repo }}          rootfs_expand: ${{ inputs.rootfs_expand }}          builder_name: ${{ inputs.builder_name }}      - name: Upload packaged FnNAS to Release        uses: ncipollo/release-action@main        if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() }}        with:          tag: ${{ env.build_tag }}          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*          allowUpdates: true          removeArtifacts: false          replacesArtifacts: true          makeLatest: true          token: ${{ secrets.GITHUB_TOKEN }}          body: |            - Built based on the fnnas.com [official Arm64 image](https://github.com/ophub/fnnas/releases/tag/fnnas_base_image),              fully preserving the original official system experience.              Extends support to a wider range of Amlogic, Rockchip, and Allwinner devices.            - 基于 fnnas.com [官方 Arm64 镜像](https://github.com/ophub/fnnas/releases/tag/fnnas_base_image) 构建，              完整保留官方原版系统体验。              扩展支持更多基于 Amlogic、Rockchip 及 Allwinner 平台的设备。
+#=====================================================================================
+# https://github.com/ophub/fnnas
+# Description: Build FnNAS Image
+#=====================================================================================
+
+name: Build FnNAS Image
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      fnnas_base_version:
+        description: "Select fnnas base image version"
+        required: false
+        default: "amlogic_693"
+        type: choice
+        options:
+          - allwinner_691
+          - amlogic_693
+          - rockchip_692
+      fnnas_board:
+        description: "Select fnnas device board"
+        required: false
+        default: "all"
+        type: string
+        options:
+          - all
+          - amlogic
+          - rockchip
+          - allwinner
+          - rockchip50
+          - rockchip50_100
+          - first50
+          - range50_100
+          - range100_150
+          - last20
+          - a311d-oes_s922x-oes-plus_wxy-oect
+          - nsy-g16-plus_nsy-g68-plus_bdy-g18-pro
+          - s905d_s905x3_s912_s922x-ct2000
+          - a311d
+          - a311d-oes
+          - alark35-3500
+          - anas3035
+          - aio-3399b
+          - aio-3399c
+          - aio-3399c-ai
+          - bdkj-bd-one
+          - bdy-g18-pro
+          - beikeyun
+          - boca-tcn100
+          - cd1000
+          - chainedbox
+          - cm3588-nas
+          - crrc
+          - dc-a588
+          - dg3399
+          - dg-tn3568
+          - dlfr100
+          - e20c
+          - e25
+          - eaidk-610
+          - emb3531
+          - fine3399
+          - firefly-itx-3588j
+          - firefly-jd4
+          - firefly-rk3399
+          - fmx1-pro
+          - fmx1-pro-b
+          - gea-6319
+          - gzpeite-p01
+          - h28k
+          - h618-devboard
+          - h66k
+          - h68k
+          - h69k
+          - h88k
+          - h88k-v3
+          - h96-max-m2
+          - hk1-rbox-k8s
+          - hs530r
+          - ht2
+          - hugsun-x99
+          - ipc-r
+          - jp-tvbox
+          - king3399
+          - kylin3399
+          - lckfb-tspi
+          - leez
+          - lx-r3s
+          - lyt-t68m
+          - lz-d3568
+          - lz-d3588
+          - lz-k3568
+          - mrkaio-m68s
+          - nanopc-t4
+          - nanopc-t6
+          - nanopi-m5
+          - nanopi-r5c
+          - nanopi-r5s
+          - nsy-g16-plus
+          - nsy-g68-plus
+          - orangepi-3b
+          - orangepi-5-plus
+          - orangepi-5b
+          - orangepi-zero3
+          - panther-x2
+          - photonicat
+          - r66s
+          - r68s
+          - renegade-rk3328
+          - rk3318-box
+          - rock-5-itx
+          - rock5b
+          - rock5c
+          - ruisen-box
+          - s905
+          - s905-beelink-mini
+          - s905-mxqpro-plus
+          - s905d
+          - s905d-ki-pro
+          - s905d-sml5442tw
+          - s905l
+          - s905l-aurora-1s
+          - s905l-b860av21u
+          - s905l-mg101
+          - s905l2
+          - s905l2-e900v21e
+          - s905l2-wojia
+          - s905l3
+          - s905l3-cm211
+          - s905l3-unt400g1
+          - s905l3-unt402a
+          - s905l3a
+          - s905l3a-cm311
+          - s905l3a-m401a
+          - s905l3b
+          - s905l3b-e900v21d
+          - s905l3b-e900v22d
+          - s905l3b-e900v22e
+          - s905l3b-ip103h
+          - s905l3b-rg020et-ca
+          - s905l3b-unt403a
+          - s905lb-ipbs9505
+          - s905lb-q96-mini
+          - s905lb-r3300l
+          - s905mb
+          - s905w
+          - s905w-w95
+          - s905w-x96-mini
+          - s905w-x96w
+          - s905x
+          - s905x-b860h
+          - s905x-nexbox-a95x
+          - s905x-t95
+          - s905x-tbee
+          - s905x-tx9
+          - s905x2
+          - s905x2-km3
+          - s905x2-x96max-2g
+          - s905x2-hg680fj
+          - s905x3
+          - s905x3-2101
+          - s905x3-a100
+          - s905x3-a95xf3
+          - s905x3-a95xf3-gb
+          - s905x3-b
+          - s905x3-h96max
+          - s905x3-hk1
+          - s905x3-ip1001m
+          - s905x3-q1
+          - s905x3-q2
+          - s905x3-tox1
+          - s905x3-tx3
+          - s905x3-tx3-bz
+          - s905x3-ugoosx3
+          - s905x3-whale
+          - s905x3-x88-pro-x3
+          - s905x3-x96air
+          - s905x3-x96air-gb
+          - s905x3-x96max
+          - s912
+          - s912-h96pro-plus
+          - s912-m8s-pro
+          - s912-nexbox-a1
+          - s912-nexbox-a2
+          - s912-onecloudpro
+          - s912-phicomm-t1
+          - s912-t95z-plus
+          - s912-tx8-max
+          - s912-tx9-pro-2g
+          - s912-tx9-pro-3g
+          - s912-x92
+          - s912-zyxq-fake
+          - s922x
+          - s922x-ct2000
+          - s922x-gtking
+          - s922x-gtkingpro-h
+          - s922x-odroid-n2
+          - s922x-oes-plus
+          - s922x-reva
+          - s922x-ugoos-am6
+          - seewo-sv21
+          - smart-am40
+          - smart-am60
+          - station-m1
+          - station-m2
+          - station-p2
+          - sv-33a6x
+          - sv-33a6x-vpu
+          - swan1-w28
+          - sw799
+          - taram
+          - tanix-tx6
+          - tb-ls3399
+          - tn3399
+          - tpm312
+          - tqc-a01
+          - tvi3315a
+          - vplus
+          - wocyber-a3
+          - wxy-oect
+          - wxy-oect-mod
+          - x88pro20
+          - x98h
+          - xiaobao
+          - yskj
+          - zcube1-max
+          - zk-r39a
+          - zysj
+      kernel_repo:
+        description: "Set fnnas kernel repository"
+        required: false
+        default: "ophub/fnnas"
+        type: choice
+        options:
+          - ophub/fnnas
+      fnnas_kernel:
+        description: "Select fnnas kernel version"
+        required: false
+        default: "6.12.y"
+        type: choice
+        options:
+          - 6.12.y
+          - 6.18.y
+          - 6.12.y_6.18.y
+      auto_kernel:
+        description: "Auto use the latest kernel"
+        required: false
+        default: true
+        type: boolean
+      rootfs_expand:
+        description: "Set rootfs expansion size(GiB)"
+        required: false
+        default: "16"
+      fnnas_url:
+        description: "Custom fnnas image download url"
+        required: false
+        default: ""
+      builder_name:
+        description: "Set fnnas builder signature"
+        required: false
+        default: "ophub"
+        type: choice
+        options:
+          - ophub
+          - angel
+          - yourname
+
+env:
+  TZ: Etc/UTC
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    if: ${{ github.event.repository.owner.id == github.event.sender.id }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Initialize the build environment
+        id: init
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          docker rmi -f $(docker images -q) 2>/dev/null || true
+          [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android 2>/dev/null
+          sudo swapoff -a
+          sudo rm -f /swapfile /mnt/swapfile
+          sudo -E apt-get -y update
+          sudo -E apt-get -y purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
+          sudo -E apt-get -y install $(curl -fsSL https://ophub.org/ubuntu2404-make-fnnas-depends)
+          sudo -E systemctl daemon-reload
+          #sudo -E apt-get -y full-upgrade
+          sudo -E apt-get -y autoremove --purge
+          sudo -E apt-get clean
+          sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
+          sudo rm -rf ~/{.cargo,.dotnet,.rustup}
+          sudo -E timedatectl set-timezone "${TZ:-Etc/UTC}"
+          sudo -E ntpdate ntp.ubuntu.com 0.pool.ntp.org || true
+          sudo -E timedatectl set-ntp true
+          date -u
+          timedatectl status || true
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Create virtual disk for extended storage
+        run: |
+          mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
+          root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
+          sudo truncate -s "${mnt_size}"G /mnt/mnt.img
+          sudo truncate -s "${root_size}"G /root.img
+          sudo losetup /dev/loop6 /mnt/mnt.img
+          sudo losetup /dev/loop7 /root.img
+          sudo pvcreate /dev/loop6
+          sudo pvcreate /dev/loop7
+          sudo vgcreate github /dev/loop6 /dev/loop7
+          sudo lvcreate -n runner -l 100%FREE github
+          sudo mkfs.xfs -f -i sparse=0 -b size=4096 /dev/github/runner
+          sudo mkdir -p /builder
+          sudo mount /dev/github/runner /builder
+          sudo chown -R runner:runner /builder
+          df -Th
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Download fnnas image [ ${{ inputs.fnnas_base_version }} ]
+        id: down
+        working-directory: /builder
+        if: (!cancelled())
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          # Create directory
+          [[ -d "fnnas" ]] || mkdir -p fnnas
+
+          input_url="${{ inputs.fnnas_url }}"
+          fnnas_base_version="${{ inputs.fnnas_base_version }}"
+          [[ -n "${fnnas_base_version}" ]] && build_tag="fnnas_${fnnas_base_version}" || build_tag="fnnas_save"
+
+          # -------------------------------------------------------
+          # Case A: URL specified
+          # -------------------------------------------------------
+          if [[ -n "${input_url}" ]]; then
+              echo "Custom URL detected: ${input_url}"
+
+              # Remove any parameters that may be included in the URL (?...)
+              clean_url="${input_url%%\?*}"
+
+              # Regex match GitHub Release URL format
+              # Format: https://github.com/<owner>/<repo>/releases/download/<tag>/<filename>
+              regex="github\.com/([^/]+)/([^/]+)/releases/download/([^/]+)/(.+)"
+
+              if [[ "${clean_url}" =~ $regex ]]; then
+                  # Extract information
+                  owner="${BASH_REMATCH[1]}"
+                  repo="${BASH_REMATCH[2]}"
+                  tag="${BASH_REMATCH[3]}"
+                  filename="${BASH_REMATCH[4]}"
+
+                  echo "Detected GitHub Release URL."
+                  echo "Repo: $owner/$repo | Tag: $tag | File: $filename"
+
+                  # Use gh cli to download
+                  gh release download "${tag}" \
+                      --repo "${owner}/${repo}" \
+                      --pattern "${filename}" \
+                      --dir "fnnas" \
+                      --clobber
+
+                  # Check download result
+                  if [[ -f "fnnas/${filename}" ]]; then
+                      echo "Download success via gh-cli."
+                      echo "status=success" >> ${GITHUB_OUTPUT}
+                      exit 0
+                  else
+                      echo "Error: gh download failed."
+                      exit 1
+                  fi
+              else
+                  # If not a standard Release URL (e.g., API URL or third-party URL), fallback to curl
+                  echo "Using curl fallback..."
+                  latest_url="${input_url}"
+                  fnnas_filename=$(basename "${clean_url}")
+              fi
+
+          # -------------------------------------------------------
+          # Case B: Automatically fetch the latest version
+          # -------------------------------------------------------
+          else
+              echo "Auto-detecting latest release..."
+              latest_version=$(curl -s \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                  https://api.github.com/repos/ophub/fnnas/releases?per_page=20 | \
+                  jq -r --arg RTK "fnnas_base_image" \
+                  --arg BOARD "${fnnas_base_version}" \
+                  '[.[] | select(.tag_name | contains($RTK))] |
+                  map(.assets[] | select(.name | contains($BOARD) and endswith(".img.xz"))) |
+                  sort_by(.updated_at) |
+                  reverse |
+                  .[0] |
+                  {data: .updated_at, url: .url, name: .name}')
+
+              [[ -z "${latest_version}" || "${latest_version}" == "null" ]] && {
+              echo "Error: Failed to resolve FnNAS image download URL."
+              }
+
+              latest_url="$(echo ${latest_version} | jq -r '.url')"
+              fnnas_filename="$(echo ${latest_version} | jq -r '.name')"
+          fi
+
+          # -------------------------------------------------------
+          # Execute curl download (only if the above gh did not run)
+          # -------------------------------------------------------
+          echo "Downloading: ${fnnas_filename}"
+          echo "Source: ${latest_url}"
+
+          curl -fsSL \
+               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/octet-stream" \
+               "${latest_url}" \
+               -o "fnnas/${fnnas_filename}"
+
+          [[ "${?}" -ne "0" ]] && echo "Error: Download failed." && exit 1
+
+          # Create directory symlinks for packaging
+          ln -sf /builder/fnnas ${{ github.workspace }}/fnnas
+          ln -sf /builder/fnnas "/home/runner/work/_actions/${OWNER,,}/fnnas/main/fnnas"
+
+          echo "build_tag=${build_tag}" >> ${GITHUB_ENV}
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Package FnNAS for target boards
+        if: ${{ steps.down.outputs.status == 'success' && !cancelled() }}
+        uses: ophub/fnnas@main
+        with:
+          fnnas_path: fnnas/*.img.xz
+          fnnas_board: ${{ inputs.fnnas_board }}
+          fnnas_kernel: ${{ inputs.fnnas_kernel }}
+          auto_kernel: ${{ inputs.auto_kernel }}
+          kernel_repo: ${{ inputs.kernel_repo }}
+          rootfs_expand: ${{ inputs.rootfs_expand }}
+          builder_name: ${{ inputs.builder_name }}
+
+      - name: Upload packaged FnNAS to Release
+        uses: ncipollo/release-action@main
+        if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() }}
+        with:
+          tag: ${{ env.build_tag }}
+          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
+          allowUpdates: true
+          removeArtifacts: false
+          replacesArtifacts: true
+          makeLatest: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            - Built based on the fnnas.com [official Arm64 image](https://github.com/ophub/fnnas/releases/tag/fnnas_base_image),
+              fully preserving the original official system experience.
+              Extends support to a wider range of Amlogic, Rockchip, and Allwinner devices.
+            - 基于 fnnas.com [官方 Arm64 镜像](https://github.com/ophub/fnnas/releases/tag/fnnas_base_image) 构建，
+              完整保留官方原版系统体验。
+              扩展支持更多基于 Amlogic、Rockchip 及 Allwinner 平台的设备。
