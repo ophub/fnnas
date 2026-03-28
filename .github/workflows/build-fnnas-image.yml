@@ -22,7 +22,7 @@ on:
         description: "Select fnnas device board"
         required: false
         default: "all"
-        type: choice
+        type: string
         options:
           - all
           - amlogic
