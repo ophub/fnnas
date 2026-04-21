@@ -87,9 +87,9 @@ firmware_repo="https://github.com/ophub/firmware"
 # Kernel download repository
 kernel_repo="https://github.com/ophub/fnnas"
 # Default kernel versions (selectable)
-rockchip_kernel=("6.12.y")
+rockchip_kernel=("6.12.y" "6.18.y")
 amlogic_kernel=("6.12.y" "6.18.y")
-allwinner_kernel=("6.12.y")
+allwinner_kernel=("6.12.y" "6.18.y")
 # Automatically use the latest kernel version
 auto_kernel="true"
 # Initialize the kernel array
