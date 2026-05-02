@@ -12,16 +12,21 @@
 # Dependent: /etc/rc.local
 # Location: /etc/custom_service/start_service.sh
 #
-# Version: v1.1
+# Version: v1.2
 #
 #========================================================================================
+
+set +euo pipefail
+
+trap 'exit 0' EXIT
+trap '' HUP INT QUIT TERM PIPE
 
 # Custom service log - all script output will be logged here.
 custom_log="/tmp/ophub_start_service.log"
 
 # A helper function for logging with timestamp.
 log_message() {
-    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] $1" >>"${custom_log}"
+    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] $1" >>"${custom_log}" 2>/dev/null || true
 }
 
 # Start of the script.
@@ -34,13 +39,20 @@ log_message "Kernel console log level set to 1 (panic only)."
 # System identification
 # Read the release file to determine the device type.
 ophub_release_file="/etc/ophub-release"
-FDT_FILE="" # Initialize FDT_FILE to be empty.
-
-[[ -f "${ophub_release_file}" ]] && { FDT_FILE="$(grep -oE 'meson.*dtb' "${ophub_release_file}" || true)"; }
-[[ -z "${FDT_FILE}" && -f "/boot/uEnv.txt" ]] && { FDT_FILE="$(grep -E '^FDT=.*\.dtb$' /boot/uEnv.txt | sed -E 's#.*/##' || true)"; }
-[[ -z "${FDT_FILE}" && -f "/boot/extlinux/extlinux.conf" ]] && { FDT_FILE="$(grep -E '/dtb/.*\.dtb$' /boot/extlinux/extlinux.conf | sed -E 's#.*/##' || true)"; }
-[[ -z "${FDT_FILE}" && -f "/boot/armbianEnv.txt" ]] && { FDT_FILE="$(grep -E '^fdtfile=.*\.dtb$' /boot/armbianEnv.txt | sed -E 's#.*/##' || true)"; }
-log_message "Detected FDT file: ${FDT_FILE:-'not found'}"
+FDTFILE=""
+# 1) /etc/ophub-release : FDTFILE='xxx.dtb'
+[[ -f "${ophub_release_file}" ]] &&
+    FDTFILE="$(awk -F"'" '/^FDTFILE=/ {print $2; exit}' "${ophub_release_file}" 2>/dev/null)"
+# 2) /boot/uEnv.txt : FDT=/dtb/.../xxx.dtb  (or FDT=xxx.dtb)
+[[ -z "${FDTFILE}" && -f "/boot/uEnv.txt" ]] &&
+    FDTFILE="$(grep -E '^FDT=.*\.dtb$' /boot/uEnv.txt 2>/dev/null | head -n1 | sed -E 's#^FDT=##; s#.*/##')"
+# 3) /boot/extlinux/extlinux.conf : "    fdt /dtb/.../xxx.dtb"
+[[ -z "${FDTFILE}" && -f "/boot/extlinux/extlinux.conf" ]] &&
+    FDTFILE="$(grep -Eo '/dtb/[^[:space:]]+\.dtb' /boot/extlinux/extlinux.conf 2>/dev/null | head -n1 | sed -E 's#.*/##')"
+# 4) /boot/armbianEnv.txt : fdtfile=vendor/xxx.dtb  (or fdtfile=xxx.dtb)
+[[ -z "${FDTFILE}" && -f "/boot/armbianEnv.txt" ]] &&
+    FDTFILE="$(grep -E '^fdtfile=.*\.dtb$' /boot/armbianEnv.txt 2>/dev/null | head -n1 | sed -E 's#^fdtfile=##; s#.*/##')"
+log_message "Detected FDT file: ${FDTFILE:-not found}"
 
 # Device-specific services
 
@@ -55,13 +67,13 @@ fi
 log_message "Adjusted rknpu module in system module load list."
 
 # For Tencent Aurora 3Pro (s905x3-b) box: Load Bluetooth module
-if [[ "${FDT_FILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]]; then
+if [[ "${FDTFILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]]; then
     grep -q -x "btmtksdio" "${ophub_load_conf}" 2>/dev/null || echo "btmtksdio" >>"${ophub_load_conf}"
     log_message "Loaded btmtksdio module for Tencent Aurora 3Pro."
 fi
 
 # For swan1-w28(rk3568) board: USB power and switch control
-if [[ "${FDT_FILE}" == "rk3568-swan1-w28.dtb" ]]; then
+if [[ "${FDTFILE}" == "rk3568-swan1-w28.dtb" ]]; then
     (
         # GPIO operations are critical, but we also add error suppression.
         gpioset 0 21=1 >/dev/null 2>&1
@@ -73,7 +85,7 @@ if [[ "${FDT_FILE}" == "rk3568-swan1-w28.dtb" ]]; then
 fi
 
 # For smart-am60(rk3588)/orangepi-5b(rk3588s) board: Bluetooth control
-if [[ "${FDT_FILE}" =~ ^(rk3588-smart-am60\.dtb|rk3588s-orangepi-5b\.dtb)$ ]]; then
+if [[ "${FDTFILE}" =~ ^(rk3588-smart-am60\.dtb|rk3588s-orangepi-5b\.dtb)$ ]]; then
     (
         rfkill block all
         chmod a+x /lib/firmware/ap6276p/brcm_patchram_plus1 >/dev/null 2>&1
@@ -85,7 +97,7 @@ if [[ "${FDT_FILE}" =~ ^(rk3588-smart-am60\.dtb|rk3588s-orangepi-5b\.dtb)$ ]]; t
 fi
 
 # For nsy-g16-plus/nsy-g68-plus/bdy-g18-pro board
-if [[ "${FDT_FILE}" =~ ^(rk3568-nsy-g16-plus\.dtb|rk3568-nsy-g68-plus\.dtb|rk3568-bdy-g18-pro\.dtb)$ ]]; then
+if [[ "${FDTFILE}" =~ ^(rk3568-nsy-g16-plus\.dtb|rk3568-nsy-g68-plus\.dtb|rk3568-bdy-g18-pro\.dtb)$ ]]; then
     (
         # Wait for network to be up
         sleep 10
@@ -102,7 +114,7 @@ if [[ "${FDT_FILE}" =~ ^(rk3568-nsy-g16-plus\.dtb|rk3568-nsy-g68-plus\.dtb|rk356
             ethtool -K eth0 tso off gso off gro off tx off rx off >/dev/null 2>&1
         fi
     ) &
-    log_message "Network optimizations applied for ${FDT_FILE}."
+    log_message "Network optimizations applied for ${FDTFILE}."
 fi
 
 # General system services
@@ -124,7 +136,7 @@ fi
 openvfd_enable="no"  # yes or no, set to "yes" to enable OpenVFD service.
 openvfd_boxid="15"   # Set the boxid according to your device.
 openvfd_restart="no" # yes or no, set to "yes" to restart the OpenVFD service.
-if [[ "${openvfd_boxid}" != "0" && "${FDT_FILE}" =~ ^meson- ]]; then
+if [[ "${openvfd_boxid}" != "0" && "${FDTFILE}" =~ ^meson- ]]; then
     (
         # Start OpenVFD service
         [[ "${openvfd_enable}" == "yes" ]] && fnnas-openvfd "${openvfd_boxid}" >/dev/null 2>&1
@@ -159,20 +171,49 @@ fi
 # Add HDMI video mode parameter to GRUB configuration if not already present
 fnnas_grub_file="/etc/default/grub"
 fnnas_add_param="video=HDMI-A-1:1920x1080@60e"
-[[ -f "${fnnas_grub_file}" ]] && {
+fnnas_grub_done="/etc/custom_service/.grub_hdmi_patched"
+[[ -f "${fnnas_grub_file}" && ! -f "${fnnas_grub_done}" ]] && {
+    # Helper: mark the task as finished (idempotent, never fatal).
+    _mark_grub_done() { : >"${fnnas_grub_done}" 2>/dev/null || true; }
+    # Helper: restore the original /etc/default/grub from backup if available.
+    _restore_grub_file() {
+        [[ -f "${fnnas_grub_file}.bak" ]] && cp -f "${fnnas_grub_file}.bak" "${fnnas_grub_file}" 2>/dev/null || true
+    }
+
     if grep "^GRUB_CMDLINE_LINUX_DEFAULT" "${fnnas_grub_file}" | grep -q "video=HDMI"; then
-        log_message "HDMI video parameter already present in GRUB configuration."
+        # Parameter already present in /etc/default/grub. Make sure the
+        # generated grub.cfg actually reflects it before declaring victory,
+        # otherwise an interrupted previous run could leave them out of sync.
+        if /usr/sbin/update-grub >/dev/null 2>&1; then
+            _mark_grub_done
+            log_message "HDMI video parameter already present; grub.cfg refreshed."
+        else
+            log_message "HDMI video parameter present but update-grub failed; will retry next boot."
+        fi
     else
         log_message "Adding HDMI video parameter to GRUB configuration."
-        # Backup the original GRUB configuration
-        cp "${fnnas_grub_file}" "${fnnas_grub_file}.bak"
-        # Append the HDMI video parameter
-        sed -i "s/^\(GRUB_CMDLINE_LINUX_DEFAULT=\".*\)\"$/\1 ${fnnas_add_param}\"/" "${fnnas_grub_file}"
-        # Update GRUB in the background
-        /usr/sbin/update-grub >/dev/null 2>&1 &
-        log_message "GRUB configuration updated."
+        # Keep the very first backup; do not overwrite it on subsequent runs.
+        [[ -f "${fnnas_grub_file}.bak" ]] || cp "${fnnas_grub_file}" "${fnnas_grub_file}.bak" 2>/dev/null
+        # Patch the file, then verify the change took effect.
+        if sed -i "s/^\(GRUB_CMDLINE_LINUX_DEFAULT=\".*\)\"$/\1 ${fnnas_add_param}\"/" "${fnnas_grub_file}" 2>/dev/null &&
+            grep "^GRUB_CMDLINE_LINUX_DEFAULT" "${fnnas_grub_file}" | grep -q "video=HDMI"; then
+            # Run update-grub synchronously so we know whether grub.cfg got
+            # written before we mark the task as done.
+            if /usr/sbin/update-grub >/dev/null 2>&1; then
+                _mark_grub_done
+                log_message "GRUB configuration updated."
+            else
+                _restore_grub_file
+                log_message "update-grub failed, /etc/default/grub restored from backup."
+            fi
+        else
+            _restore_grub_file
+            log_message "sed failed to patch GRUB, original file restored."
+        fi
     fi
-}
+    unset -f _mark_grub_done _restore_grub_file
+} || true
 
 # Finalization
 log_message "All custom services processed."
+exit 0
