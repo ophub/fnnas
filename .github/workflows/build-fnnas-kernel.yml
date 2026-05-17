@@ -167,7 +167,7 @@ jobs:
           dtbs_install: ${{ inputs.dtbs_install }}
 
       - name: Upload Kernel to Release
-        uses: ophub/upload-to-release@main
+        uses: ophub/upload-to-releases@main
         if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() }}
         with:
           tag: kernel_fnnas
