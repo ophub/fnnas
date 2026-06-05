@@ -17,8 +17,11 @@ on:
         type: choice
         options:
           - amlogic_1252
+          - amlogic_693
           - rockchip_1253
+          - rockchip_692
           - allwinner_1254
+          - allwinner_691
       debs_repo:
         description: "Set fnnas debs repository"
         required: false
@@ -40,6 +43,7 @@ on:
         type: choice
         options:
           - 6.18.y
+          - 6.12.y
       dtbs_install:
         description: "Install kernel dtbs files"
         required: false

@@ -16,8 +16,11 @@ on:
         type: choice
         options:
           - amlogic_1252
+          - amlogic_693
           - rockchip_1253
+          - rockchip_692
           - allwinner_1254
+          - allwinner_691
       fnnas_board:
         description: "Select fnnas device board"
         required: false
@@ -252,6 +255,7 @@ on:
         type: choice
         options:
           - 6.18.y
+          - 6.12.y
       auto_kernel:
         description: "Auto use the latest kernel"
         required: false
