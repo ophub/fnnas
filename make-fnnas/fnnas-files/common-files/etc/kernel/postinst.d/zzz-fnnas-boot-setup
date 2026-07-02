@@ -29,7 +29,10 @@ if [ -z "${version}" ]; then
     version="$(ls -1 /boot/vmlinuz-* 2>/dev/null | sort -V | tail -n 1 | sed 's|/boot/vmlinuz-||')"
 fi
 # If still no version is found, exit the script
-[ -n "${version}" ] || exit 0
+[ -n "${version}" ] || {
+    echo "update-initramfs: fnnas: No kernel version specified or found in /boot, exiting." >&2
+    exit 0
+}
 
 echo "update-initramfs: fnnas: Platform: ${PLATFORM}, Model ID: ${MODEL_ID}, Kernel Version: ${version}" >&2
 
