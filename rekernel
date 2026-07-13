@@ -353,18 +353,27 @@ chroot_fnnas() {
             mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc 2>/dev/null || true
         fi
 
-        # Install qemu-user-static if the binary is missing
+        # Install qemu packages if the binary is still missing
         if [[ ! -f "/usr/bin/${qemu_binary_arm64}" ]]; then
-            echo -e "${NOTE} [ ${qemu_binary_arm64} ] not found, installing qemu-user-static..."
+            echo -e "${NOTE} [ ${qemu_binary_arm64} ] not found, installing qemu packages..."
             if command -v apt-get &>/dev/null; then
-                # Install qemu-user-static package
+                # Try qemu-user-static first (Ubuntu ≤24.04), fall back to qemu-user-binfmt (Ubuntu 26.04+)
                 {
                     DEBIAN_FRONTEND=noninteractive apt-get update -yq &&
                         DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends qemu-user-static
-                } 2>/dev/null ||
-                    echo -e "${WARNING} Failed to install qemu-user-static via apt-get."
+                } 2>/dev/null || {
+                    # Ubuntu 26.04+ provides qemu-user-binfmt instead of qemu-user-static
+                    echo -e "${NOTE} qemu-user-static not available, trying qemu-user-binfmt..."
+                    DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends qemu-user-binfmt binfmt-support 2>/dev/null ||
+                        echo -e "${WARNING} Failed to install qemu packages via apt-get."
+                }
+                # If qemu-user was installed (provides qemu-aarch64), copy it to the expected name
+                [[ ! -f "/usr/bin/${qemu_binary_arm64}" && -f "/usr/bin/qemu-aarch64" ]] && {
+                    cp -f "/usr/bin/qemu-aarch64" "/usr/bin/${qemu_binary_arm64}" 2>/dev/null ||
+                        echo -e "${WARNING} Failed to copy qemu-aarch64 to ${qemu_binary_arm64}."
+                }
             else
-                echo -e "${WARNING} Package manager not recognized. Please install qemu-user-static manually."
+                echo -e "${WARNING} Package manager not recognized. Please install qemu-user-static or qemu-user-binfmt manually."
             fi
         fi
 
