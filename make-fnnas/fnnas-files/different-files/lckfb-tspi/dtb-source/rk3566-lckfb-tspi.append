@@ -1,0 +1,60 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Enable the on-board Gigabit Ethernet (GMAC1 / RGMII) of the LCKFB Taishan Pi.
+ *
+ * The mainline board DTS (arch/arm64/boot/dts/rockchip/rk3566-lckfb-tspi.dts)
+ * does not describe &gmac1 / &mdio1, so the RJ45 port is dead on a mainline
+ * kernel even though the hardware is present and works.
+ *
+ * Every value below is taken verbatim from the vendor BSP device tree
+ * rk3566-taishanpi-v10.dtb as shipped by ophub/amlogic-s9xxx-armbian:
+ *
+ *   phy-mode             = "rgmii"
+ *   clock_in_out         = "output"
+ *   tx_delay             = <0x4f>
+ *   rx_delay             = <0x25>
+ *   snps,reset-gpio      = <&gpio0 RK_PC7 GPIO_ACTIVE_LOW>   // BSP pin 0x17
+ *   snps,reset-delays-us = <0 20000 100000>
+ *   PHY address          = 0, IEEE 802.3 c22 generic (RTL8211F)
+ *   pinctrl groups       = gmac1m1_* (M1 pin mux)
+ *
+ * Verified on real hardware with FnNAS + kernel 6.18.18:
+ *   rk_gmac-dwmac fe010000.ethernet: init for RGMII
+ *   rk_gmac-dwmac fe010000.ethernet: TX delay(0x4f). RX delay(0x25).
+ *   eth0: PHY [stmmac-0:00] driver [RTL8211F Gigabit Ethernet]
+ *   Speed: 1000Mb/s  Duplex: Full  Link detected: yes
+ */
+
+&gmac1 {
+	assigned-clocks = <&cru SCLK_GMAC1_RX_TX>, <&cru SCLK_GMAC1>;
+	assigned-clock-parents = <&cru SCLK_GMAC1_RGMII_SPEED>, <&cru CLK_MAC1_2TOP>;
+	assigned-clock-rates = <0>, <125000000>;
+
+	clock_in_out = "output";
+	phy-mode = "rgmii";
+	phy-handle = <&rgmii_phy1>;
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&gmac1m1_miim
+		     &gmac1m1_tx_bus2
+		     &gmac1m1_rx_bus2
+		     &gmac1m1_rgmii_clk
+		     &gmac1m1_rgmii_bus>;
+
+	snps,reset-gpio = <&gpio0 RK_PC7 GPIO_ACTIVE_LOW>;
+	snps,reset-active-low;
+	/* Reset time is 20ms, 100ms for rtl8211f */
+	snps,reset-delays-us = <0 20000 100000>;
+
+	tx_delay = <0x4f>;
+	rx_delay = <0x25>;
+
+	status = "okay";
+};
+
+&mdio1 {
+	rgmii_phy1: ethernet-phy@0 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <0x0>;
+	};
+};
