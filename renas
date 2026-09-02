@@ -940,6 +940,86 @@ replace_kernel() {
 
     # Board-specific kernel file adjustments
     [[ "${adjust_kernel_files}" == "yes" ]] && adjust_kernel_files_cmd
+
+    # 05. Rebuild the board DTB from source when needed
+    rebuild_board_dtb
+}
+
+rebuild_board_dtb() {
+    # Rebuild a board's DTB from source when the kernel's prebuilt DTB lacks
+    # board-specific nodes.
+    #
+    # Some mainline board DTS files are incomplete: the upstream kernel may not
+    # describe every peripheral the vendor board actually has (for example the
+    # LCKFB Taishan Pi has an on-board RTL8211F GMAC1 that mainline does not
+    # enable). Because dtc strips unreferenced pinctrl groups via
+    # /omit-if-no-ref/, those groups are absent from the prebuilt DTB and cannot
+    # be restored by patching the binary. The only reliable fix is to recompile
+    # the DTS from source with the missing nodes appended, letting dtc assign
+    # phandles and validate every reference.
+    #
+    # Layout (all optional, skipped when absent):
+    #   fnnas-files/different-files/${board}/dtb-source/*.dts     board DTS + .dtsi deps
+    #   fnnas-files/different-files/${board}/dtb-source/*.append  nodes to append
+    #
+    # The .append file is concatenated onto the matching .dts before compiling.
+    dtb_src_path="${different_files}/${board}/dtb-source"
+    [[ -d "${dtb_src_path}" ]] || return 0
+
+    dtb_base="${FDTFILE%.dtb}"
+    dtb_main_dts="${dtb_src_path}/${dtb_base}.dts"
+    dtb_append="${dtb_src_path}/${dtb_base}.append"
+
+    [[ -f "${dtb_main_dts}" ]] || {
+        echo -e "${WARNING} dtb-source exists but [ ${dtb_base}.dts ] is missing, skipping DTB rebuild."
+        return 0
+    }
+
+    # dt-bindings headers come from the kernel header package unpacked above
+    dtb_include="${tag_rootfs}/usr/src/${header_path}/include"
+    [[ -d "${dtb_include}/dt-bindings" ]] || {
+        echo -e "${WARNING} dt-bindings headers not found in [ ${dtb_include} ], skipping DTB rebuild."
+        return 0
+    }
+
+    command -v dtc >/dev/null 2>&1 || error_msg "The [ dtc ] command is missing, install device-tree-compiler."
+    command -v cpp >/dev/null 2>&1 || error_msg "The [ cpp ] command is missing, install build-essential."
+
+    dtb_work="${tmp_path}/dtb-rebuild-${board}"
+    rm -rf "${dtb_work}" 2>/dev/null
+    mkdir -p "${dtb_work}"
+
+    # Stage every source file so relative #include "..." resolves
+    cp -f "${dtb_src_path}"/*.dts "${dtb_src_path}"/*.dtsi "${dtb_work}" 2>/dev/null
+
+    if [[ -f "${dtb_append}" ]]; then
+        cat "${dtb_append}" >>"${dtb_work}/${dtb_base}.dts"
+        echo -e "${INFO} Appended [ ${dtb_base}.append ] to the board DTS."
+    fi
+
+    # Preprocess, then compile. -@ keeps __symbols__ so overlays still work.
+    cpp -nostdinc -I "${dtb_include}" -I "${dtb_work}" -undef \
+        -x assembler-with-cpp -o "${dtb_work}/${dtb_base}.pp" \
+        "${dtb_work}/${dtb_base}.dts" ||
+        error_msg "Failed to preprocess [ ${dtb_base}.dts ]."
+
+    dtc -@ -q -I dts -O dtb -o "${dtb_work}/${dtb_base}.dtb" \
+        "${dtb_work}/${dtb_base}.pp" ||
+        error_msg "Failed to compile [ ${dtb_base}.dts ]."
+
+    [[ -s "${dtb_work}/${dtb_base}.dtb" ]] || error_msg "Compiled DTB [ ${dtb_base}.dtb ] is empty."
+
+    # Sanity check: the result must be a parseable FDT
+    dtc -I dtb -O dts -o /dev/null "${dtb_work}/${dtb_base}.dtb" 2>/dev/null ||
+        error_msg "Compiled DTB [ ${dtb_base}.dtb ] failed verification."
+
+    dtb_target="${tag_bootfs}/dtb/${PLATFORM}/${FDTFILE}"
+    dtb_old_size="$(stat -c%s "${dtb_target}" 2>/dev/null || echo 0)"
+    cp -f "${dtb_work}/${dtb_base}.dtb" "${dtb_target}" ||
+        error_msg "Failed to install the rebuilt DTB to [ ${dtb_target} ]."
+
+    echo -e "${INFO} Rebuilt DTB from source: [ ${FDTFILE} ] ${dtb_old_size} -> $(stat -c%s "${dtb_target}") bytes."
+    rm -rf "${dtb_work}" 2>/dev/null
 }
 
 refactor_bootfs() {
