@@ -173,12 +173,11 @@ jobs:
           [[ "${?}" -ne "0" ]] && echo "Error: Download failed." && exit 1
 
           ln -sf /builder/fnnas ${{ github.workspace }}/fnnas
-          ln -sf /builder/fnnas /home/runner/work/_actions/ophub/fnnas/main/fnnas
 
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Compile the FnNAS kernel
-        uses: ophub/fnnas@main
+        uses: ./
         if: ${{ steps.down.outputs.status == 'success' && !cancelled() }}
         with:
           build_target: kernel

@@ -63,7 +63,7 @@ runs:
   steps:
     - shell: bash
       run: |
-        cd ${{ github.action_path }}
+        cd ${{ github.workspace }}
         echo -e "FnNAS Actions working directory: [ ${PWD} ]"
 
         # Get build target
@@ -125,7 +125,7 @@ runs:
         if [[ "${build_target}" == "fnnas" ]]; then
             echo -e "Starting FnNAS system rebuild..."
 
-            cd ${{ github.action_path }}
+            cd ${{ github.workspace }}
             echo -e "Building FnNAS system image..."
             make_args=()
             [[ -n "${{ inputs.fnnas_board }}"   ]] && make_args+=(-b "${{ inputs.fnnas_board }}")
@@ -144,7 +144,7 @@ runs:
             kernel_outpath="fnnas/out"
             [[ -d "${kernel_outpath}" ]] || mkdir -p ${kernel_outpath}
 
-            cd ${{ github.action_path }}
+            cd ${{ github.workspace }}
             make_args=()
             [[ -n "${{ inputs.debs_repo }}"    ]] && make_args+=(-r "${{ inputs.debs_repo }}")
             [[ -n "${{ inputs.debs_install }}" ]] && make_args+=(-e "${{ inputs.debs_install }}")
@@ -158,7 +158,7 @@ runs:
         fi
 
         # Output environment variables
-        cd ${{ github.action_path }}
+        cd ${{ github.workspace }}
         echo -e "Exporting output environment variables..."
         echo "PACKAGED_OUTPUTPATH=${PWD}/${fnnas_outpath}" >> ${GITHUB_ENV}
         echo "PACKAGED_OUTPUTDATE=$(date +"%m.%d.%H%M")" >> ${GITHUB_ENV}
