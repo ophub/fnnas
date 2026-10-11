@@ -1,0 +1,16 @@
+[Unit]
+Description=NanoPi R28S: ethernet naming (eth0=SoC gmac / eth1=PCIe NIC) and WAN/LAN port LEDs
+# udev (90-r28s-hwfix.rules) does the rename/LED binding as soon as the devices
+# appear; this unit is the safety net for systems where the udev RUN never
+# happened (e.g. rules installed while udev was already running).
+After=local-fs.target sysinit.target
+Wants=network-pre.target
+Before=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/r28s-hwfix.sh all --wait 20
+
+[Install]
+WantedBy=multi-user.target

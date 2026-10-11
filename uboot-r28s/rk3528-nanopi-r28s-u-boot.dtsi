@@ -1,0 +1,29 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * U-Boot 专用补充: FriendlyELEC NanoPi R28S (RK3528A)
+ *
+ * R28S 调试串口是 UART2 (0xffa0000, m1 引脚组), 不是 Zero2 的 UART0.
+ * 主线 rk3528-u-boot.dtsi 默认只给 &uart0 / &uart0m0_xfer 加 bootph,
+ * R28S 必须额外给 &uart2 / &uart2m1_xfer 加 bootph 标记,
+ * 否则 SPL 阶段不初始化 UART2 -> 串口无输出, 内核 earlycon 起不来(卡死根因之一).
+ */
+
+#include "rk3528-u-boot.dtsi"
+
+&uart2 {
+	bootph-all;
+	clock-frequency = <24000000>;
+};
+
+&uart2m1_xfer {
+	bootph-pre-sram;
+	bootph-pre-ram;
+};
+
+&uart2m1_ctsn {
+	bootph-pre-ram;
+};
+
+&uart2m1_rtsn {
+	bootph-pre-ram;
+};

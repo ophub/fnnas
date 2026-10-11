@@ -1,0 +1,6 @@
+# R28S u-boot 源文件与 workflow 强制 LF (Linux 编译环境要求)
+*.dts text eol=lf
+*.dtsi text eol=lf
+*_defconfig text eol=lf
+*.yml text eol=lf
+uboot-r28s/** text eol=lf

@@ -109,6 +109,7 @@ on:
           - nanopc-t4
           - nanopc-t6
           - nanopi-m5
+          - nanopi-r28s
           - nanopi-r5c
           - nanopi-r5s
           - nanopi-som

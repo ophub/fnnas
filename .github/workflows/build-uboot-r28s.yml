@@ -1,0 +1,126 @@
+name: Build U-Boot for NanoPi R28S (RK3528)
+
+on:
+  workflow_dispatch:
+    inputs:
+      uboot_ref:
+        description: '主线 u-boot 的 ref (分支/tag)'
+        required: true
+        default: 'master'
+      ddr_ver:
+        description: 'rkbin DDR blob 文件名'
+        required: true
+        default: 'rk3528_ddr_1056MHz_v1.14.bin'
+      bl31_ver:
+        description: 'BL31 来源: repo=用仓库固定的 v1.18 / 否则填 rkbin 文件名'
+        required: true
+        default: 'repo'
+
+env:
+  BOARD: nanopi-r28s-rk3528
+  DTS_NAME: rk3528-nanopi-r28s
+
+permissions:
+  contents: write
+
+jobs:
+  build-uboot:
+    runs-on: ubuntu-latest
+    name: Compile mainline U-Boot for R28S
+    steps:
+      - name: Install cross toolchain & deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc-aarch64-linux-gnu device-tree-compiler \
+            python3-dev python3-pyelftools python3-setuptools \
+            swig bison flex libssl-dev libgnutls28-dev uuid-dev \
+            bc cpio rsync
+
+      - name: Checkout this repo (R28S dts/defconfig source)
+        uses: actions/checkout@v4
+        with:
+          path: r28s-src
+
+      - name: Clone mainline u-boot
+        run: |
+          git clone --depth 1 --branch ${{ inputs.uboot_ref }} \
+            https://github.com/u-boot/u-boot.git u-boot
+          cd u-boot && git log --oneline -1
+
+      - name: Clone rockchip rkbin (DDR blob only)
+        run: |
+          git clone --depth 1 https://github.com/rockchip-linux/rkbin.git rkbin
+          ls -la rkbin/bin/rk35/ | grep -E 'rk3528_ddr' || true
+          echo "--- BL31 用仓库固定版本(不从 rkbin 拉最新,避免 v1.21 兼容性问题) ---"
+          ls -la r28s-src/uboot-r28s/rk3528_bl31_v1.18.elf
+
+      - name: Inject R28S dts & defconfig into u-boot tree
+        run: |
+          cd u-boot
+          # 板级内核 dts -> dts/upstream (主线 u-boot 从这里引板级 dts)
+          cp ../r28s-src/uboot-r28s/${DTS_NAME}.dts \
+             dts/upstream/src/arm64/rockchip/${DTS_NAME}.dts
+          # u-boot 专用 dtsi -> arch/arm/dts
+          cp ../r28s-src/uboot-r28s/${DTS_NAME}-u-boot.dtsi \
+             arch/arm/dts/${DTS_NAME}-u-boot.dtsi
+          # defconfig -> configs
+          cp ../r28s-src/uboot-r28s/${BOARD}_defconfig \
+             configs/${BOARD}_defconfig
+          echo "--- injected ---"
+          ls -la dts/upstream/src/arm64/rockchip/${DTS_NAME}.dts \
+                 arch/arm/dts/${DTS_NAME}-u-boot.dtsi \
+                 configs/${BOARD}_defconfig
+
+      - name: Register board dtb in rockchip Makefile (if needed)
+        run: |
+          cd u-boot
+          # 主线 u-boot 的板级 dtb 由 dts/upstream 的 kbuild 接管,
+          # 确认 arch/arm/dts/Makefile 是否需要补一行 dtb 列表.
+          if grep -q "rk3528-nanopi-zero2.dtb" arch/arm/dts/Makefile; then
+            echo "found zero2 entry, appending r28s after it"
+            sed -i '/rk3528-nanopi-zero2.dtb/a\\	dtb-\$(CONFIG_ROCKCHIP_RK3528) += ${DTS_NAME}.dtb' \
+              arch/arm/dts/Makefile || true
+            grep -n "nanopi-r28s\|nanopi-zero2" arch/arm/dts/Makefile || true
+          else
+            echo "no explicit dtb list for zero2 (using dts/upstream auto), skip"
+          fi
+
+      - name: Build U-Boot
+        run: |
+          cd u-boot
+          # BL31: 默认用仓库固定的 v1.18(与 ROCK2A/Sige1 成功启动同源, fwver v2.3-857-g059b3c586:derrick.huang)
+          if [ "${{ inputs.bl31_ver }}" = "repo" ]; then
+            export BL31="$GITHUB_WORKSPACE/r28s-src/uboot-r28s/rk3528_bl31_v1.18.elf"
+          else
+            export BL31="$GITHUB_WORKSPACE/rkbin/bin/rk35/${{ inputs.bl31_ver }}"
+          fi
+          export ROCKCHIP_TPL="$GITHUB_WORKSPACE/rkbin/bin/rk35/${{ inputs.ddr_ver }}"
+          echo "BL31=$BL31"; ls -la "$BL31"
+          echo "TPL=$ROCKCHIP_TPL"; ls -la "$ROCKCHIP_TPL"
+          echo "--- BL31 fwver ---"
+          strings "$BL31" | grep -i "fwver" | head -1 || true
+          make ${BOARD}_defconfig
+          make -j"$(nproc)" CROSS_COMPILE=aarch64-linux-gnu-
+
+      - name: Verify artifacts & embedded dtb
+        run: |
+          cd u-boot
+          ls -la idbloader.img u-boot.itb
+          file idbloader.img u-boot.itb || true
+          echo "--- idbloader magic (expect RKNS) ---"
+          xxd idbloader.img | head -2 || true
+          echo "--- check R28S model string in built dtb ---"
+          strings u-boot.itb | grep -i "NanoPi R28S" || echo "WARN: model string not found in u-boot.itb"
+          echo "--- build tree dtb ---"
+          ls -la dts/dt.dtb 2>/dev/null || find . -name 'rk3528-nanopi-r28s.dtb' 2>/dev/null | head
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: r28s-mainline-uboot
+          path: |
+            u-boot/idbloader.img
+            u-boot/u-boot.itb
+          if-no-files-found: error
+          retention-days: 30

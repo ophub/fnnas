@@ -1,0 +1,16 @@
+# NanoPi R28S (RK3528A) -- ethernet naming + port LED binding.
+#
+#  * eth0 must be the SoC gmac (RTL8211F, PCB port "1"), eth1 the PCIe NIC
+#    (RTL8111H, port "2"): the kernel assigns names in probe order and the
+#    PCIe NIC normally wins, so the numbers come out swapped.
+#  * both port LEDs (gpio4 PB1 / PB3) carry linux,default-trigger = "netdev",
+#    but such a trigger stays inert until an interface name is written to its
+#    device_name attribute -- fnOS never does that, so the LEDs stay dark.
+#
+# NOTE: deliberately installed as 90-*, i.e. AFTER systemd's own
+# 80-net-setup-link.rules.  A 70-* rule that assigns NAME= gets overwritten
+# again by the net_setup_link builtin, which is why the earlier attempt did
+# nothing.  All the work (rename + LED binding, resolved from the hardware
+# device path rather than from the interface name) is done by the script.
+ACTION=="add", SUBSYSTEM=="net", RUN+="/usr/local/sbin/r28s-hwfix.sh all"
+ACTION=="add", SUBSYSTEM=="leds", RUN+="/usr/local/sbin/r28s-hwfix.sh leds"

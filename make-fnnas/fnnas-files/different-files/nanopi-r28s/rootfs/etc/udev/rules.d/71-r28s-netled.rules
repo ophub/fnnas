@@ -1,0 +1,8 @@
+# SUPERSEDED -- do not use.
+#
+# The old 71-r28s-netled.rules matched KERNEL=="wan"/"lan", the LED class names
+# that only existed while the DTB carried label="wan"/"lan"; it also bound the
+# LEDs by interface *name*, which is exactly what is unreliable here.
+# LED binding (and the ethernet renaming) now lives in
+# /etc/udev/rules.d/90-r28s-hwfix.rules -> /usr/local/sbin/r28s-hwfix.sh,
+# which resolves each LED to its interface through the hardware device path.

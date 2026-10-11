@@ -1,0 +1,8 @@
+# SUPERSEDED -- do not use.
+#
+# The old 70-r28s-netname.rules assigned NAME= from 70-*, i.e. *before*
+# systemd's 80-net-setup-link.rules, so the net_setup_link builtin immediately
+# overwrote the name again.  Its match pattern was also wrong: it expected the
+# vendor driver name "rk_gmac-dwmac", while the mainline/Rockchip 6.x kernel
+# used here binds the SoC MAC through "dwmac-rk".
+# Ethernet naming is handled by /etc/udev/rules.d/90-r28s-hwfix.rules now.

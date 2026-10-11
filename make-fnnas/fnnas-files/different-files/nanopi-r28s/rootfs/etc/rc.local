@@ -1,0 +1,5 @@
+#!/bin/sh
+# NanoPi R28S: ethernet naming (eth0 = SoC gmac / PCB port "1") and the
+# WAN/LAN port LEDs (gpio4 PB1 / PB3, netdev trigger).  See r28s-hwfix.sh.
+[ -x /usr/local/sbin/r28s-hwfix.sh ] && /usr/local/sbin/r28s-hwfix.sh all
+exit 0
