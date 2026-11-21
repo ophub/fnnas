@@ -1,0 +1,62 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "rockchip,rk3528";
+
+    /* 1. 注入 WiFi 3.3V 独立供电稳压器 (GPIO3_B2, pin 106) */
+    fragment@0 {
+        target-path = "/";
+        __overlay__ {
+            vcc_wifi: vcc-wifi-regulator {
+                compatible = "regulator-fixed";
+                regulator-name = "vcc_wifi";
+                regulator-min-microvolt = <3300000>;
+                regulator-max-microvolt = <3300000>;
+                regulator-always-on;
+                regulator-boot-on;
+                enable-active-high;
+                gpio = <&gpio3 10 0>; /* GPIO3_B2, ACTIVE_HIGH */
+            };
+        };
+    };
+
+    /* 2. 纠正 USB 5V 稳压器引脚为 GPIO4_B4 (Pin 12) */
+    fragment@1 {
+        target-path = "/vcc5v0-host";
+        __overlay__ {
+            gpio = <&gpio4 12 0>; /* GPIO4_B4, ACTIVE_HIGH */
+            enable-active-high;
+        };
+    };
+
+    /* 3. 禁用冲突的 gpio-keys (防止按键误触发重启) */
+    fragment@2 {
+        target-path = "/gpio-keys";
+        __overlay__ {
+            status = "disabled";
+        };
+    };
+
+    /* 4. 针对 /soc/mmc@ffc20000: 注入 vmmc-supply 与 keep-power-in-suspend */
+    fragment@3 {
+        target-path = "/soc/mmc@ffc20000";
+        __overlay__ {
+            vmmc-supply = <&vcc_wifi>;
+            keep-power-in-suspend;
+            status = "okay";
+        };
+    };
+
+    /* 5. 针对 /sdio-pwrseq: 包含 32.768kHz 睡眠时钟与硬件复位时序 */
+    fragment@4 {
+        target-path = "/sdio-pwrseq";
+        __overlay__ {
+            pinctrl-names = "default";
+            pinctrl-0 = <&wifi_enable_h &wifi_power_on_h &clkm0_32k_out>;
+            reset-gpios = <&gpio3 12 1>; /* GPIO3_B4, ACTIVE_LOW */
+            post-power-on-delay-ms = <100>;
+            status = "okay";
+        };
+    };
+};

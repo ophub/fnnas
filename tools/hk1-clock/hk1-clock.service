@@ -1,0 +1,14 @@
+[Unit]
+Description=HK1 RBOX K8 Front Panel VFD Clock Daemon
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/hk1-clock
+Restart=always
+RestartSec=5
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

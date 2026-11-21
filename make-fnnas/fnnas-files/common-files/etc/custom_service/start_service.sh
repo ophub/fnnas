@@ -167,6 +167,15 @@ if [[ -x "/usr/bin/oes_sata_leds.sh" ]]; then
     log_message "SATA LED status monitor (oes_sata_leds.sh) started."
 fi
 
+# For HK1 RBOX K8 (RK3528) VFD clock display service
+if [[ "${FDTFILE}" == "rk3528-hk1-rbox-k8.dtb" && -x "/usr/local/bin/hk1-clock" ]]; then
+    /usr/local/bin/hk1-clock >/dev/null 2>&1 &
+    log_message "HK1 RBOX K8 VFD clock display service started."
+elif [[ "${FDTFILE}" == "rk3528-hk1-rbox-k8.dtb" && -x "/usr/bin/hk1-clock" ]]; then
+    /usr/bin/hk1-clock >/dev/null 2>&1 &
+    log_message "HK1 RBOX K8 VFD clock display service started."
+fi
+
 # Add HDMI video mode parameter to GRUB configuration if not already present
 fnnas_grub_file="/etc/default/grub"
 fnnas_add_param="video=HDMI-A-1:1920x1080@60e"
