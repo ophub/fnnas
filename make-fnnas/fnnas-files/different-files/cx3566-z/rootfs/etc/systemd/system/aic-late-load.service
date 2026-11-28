@@ -1,0 +1,12 @@
+[Unit]
+Description=Load self-built AIC8800 WiFi driver (CX3566-Z)
+After=multi-user.target
+Wants=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/lib/aic8800/load-aic.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

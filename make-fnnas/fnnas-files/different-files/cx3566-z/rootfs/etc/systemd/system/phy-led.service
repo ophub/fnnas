@@ -1,0 +1,10 @@
+[Unit]
+Description=MAE0621A Ethernet LED map fix (LCR 0x0368 mainstream scheme)
+After=local-fs.target
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/phy-led-watch.sh
+Restart=always
+RestartSec=2
+[Install]
+WantedBy=multi-user.target
